@@ -1,0 +1,34 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "display": "@sfos/tsconfig — base",
+  "_comment": "Canonical strict TS settings live here. The repo-root tsconfig.base.json is a thin re-export so dep-cruiser (which reads from the root) and the @sfos/tsconfig package (which is consumed via pnpm symlink) both stay functional. Inlining avoids the pnpm-symlink + relative `extends` crossing that breaks tooling like get-tsconfig.",
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "verbatimModuleSyntax": true,
+
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "noImplicitOverride": true,
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitReturns": true,
+    "exactOptionalPropertyTypes": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "useUnknownInCatchVariables": true,
+
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "allowJs": false,
+    "checkJs": false,
+
+    "lib": ["ES2022"],
+    "types": []
+  },
+  "exclude": ["node_modules", "dist", ".turbo"]
+}

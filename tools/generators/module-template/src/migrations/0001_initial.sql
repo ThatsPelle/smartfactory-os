@@ -1,0 +1,52 @@
+-- =============================================================================
+-- __DISPLAY_NAME__ module — initial migration.
+-- =============================================================================
+--
+-- Conventions enforced by CI:
+--   - Every tenant-scoped table includes `company_id` and an RLS policy.
+--   - Every state-changing operation emits an event (via outbox in app code).
+--   - The schema namespace is `__SCHEMA_NAME__`.
+--   - Per-module Postgres role grants prevent cross-schema writes.
+--
+-- The `create_tenant_table` SQL macro (added to @sfos/db in a later phase)
+-- generates the boilerplate: CREATE TABLE, ALTER TABLE ENABLE RLS, SELECT/
+-- INSERT/UPDATE/DELETE policies using `current_company_id()`, plus the
+-- `(company_id)` index. Until that macro lands, write the boilerplate
+-- explicitly and CI's rls-checker will verify it.
+--
+-- This template's migration is intentionally empty. Replace with real
+-- table definitions when the module's entities are introduced.
+
+CREATE SCHEMA IF NOT EXISTS __SCHEMA_NAME__;
+
+-- Example pattern (commented out until you have a real entity):
+--
+-- CREATE TABLE __SCHEMA_NAME__.example_entity (
+--     id           BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+--     company_id   UUID NOT NULL,
+--     created_at   TIMESTAMPTZ NOT NULL DEFAULT now(),
+--     updated_at   TIMESTAMPTZ NOT NULL DEFAULT now(),
+--     created_by   UUID NOT NULL,
+--     updated_by   UUID NOT NULL,
+--     deleted_at   TIMESTAMPTZ,
+--     -- domain columns:
+--     name         TEXT NOT NULL,
+--     UNIQUE (company_id, name)
+-- );
+--
+-- CREATE INDEX example_entity_company_id_idx
+--     ON __SCHEMA_NAME__.example_entity (company_id);
+--
+-- ALTER TABLE __SCHEMA_NAME__.example_entity ENABLE ROW LEVEL SECURITY;
+-- ALTER TABLE __SCHEMA_NAME__.example_entity FORCE ROW LEVEL SECURITY;
+--
+-- CREATE POLICY example_entity_select_policy
+--     ON __SCHEMA_NAME__.example_entity
+--     FOR SELECT
+--     USING (company_id = current_company_id());
+--
+-- CREATE POLICY example_entity_modify_policy
+--     ON __SCHEMA_NAME__.example_entity
+--     FOR ALL
+--     USING (company_id = current_company_id())
+--     WITH CHECK (company_id = current_company_id());

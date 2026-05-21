@@ -1,0 +1,33 @@
+{
+  "name": "@sfos/module-sdk",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Public SDK for SmartFactory OS modules: lifecycle interfaces, registry types, helper builders.",
+  "license": "MIT",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": ["dist", "src", "LICENSE"],
+  "scripts": {
+    "build": "tsc -b",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint src",
+    "clean": "rimraf dist .turbo"
+  },
+  "dependencies": {
+    "@sfos/contracts": "workspace:*",
+    "@sfos/events": "workspace:*"
+  },
+  "devDependencies": {
+    "@sfos/eslint-config": "workspace:*",
+    "@sfos/tsconfig": "workspace:*",
+    "typescript": "^5.6.2",
+    "rimraf": "^6.0.1"
+  }
+}

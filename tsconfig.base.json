@@ -1,0 +1,6 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "display": "SmartFactory OS Base",
+  "_comment": "Strict settings live in @sfos/tsconfig/base — see packages/tsconfig/base.json. This root file is the documented canonical entry point (dep-cruiser reads it; ADR-0001 references it) but delegates content to the package so the chain stays free of pnpm-symlink + relative `extends` traversal.",
+  "extends": "@sfos/tsconfig/base"
+}

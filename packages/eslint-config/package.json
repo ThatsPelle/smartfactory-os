@@ -1,0 +1,33 @@
+{
+  "name": "@sfos/eslint-config",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Shared ESLint v9 flat-config presets + architectural rules for SmartFactory OS.",
+  "license": "AGPL-3.0-or-later",
+  "type": "module",
+  "main": "./src/index.js",
+  "exports": {
+    ".": "./src/index.js",
+    "./base": "./src/configs/base.js",
+    "./node": "./src/configs/node.js",
+    "./react": "./src/configs/react.js",
+    "./tests": "./src/configs/tests.js",
+    "./plugin-architecture": "./src/plugin-architecture.js"
+  },
+  "files": ["src"],
+  "scripts": {
+    "lint": "eslint src",
+    "typecheck": "echo 'no compile step; .js files type-check via JSDoc only'"
+  },
+  "peerDependencies": {
+    "eslint": "^9.0.0",
+    "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "@eslint/js": "^9.12.0",
+    "eslint-import-resolver-typescript": "^4.0.0",
+    "eslint-plugin-import-x": "^4.3.1",
+    "globals": "^15.10.0",
+    "typescript-eslint": "^8.8.0"
+  }
+}

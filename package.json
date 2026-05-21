@@ -1,0 +1,38 @@
+{
+  "name": "smartfactory-os",
+  "version": "0.0.0",
+  "private": true,
+  "description": "SmartFactory OS — modular industrial operating platform",
+  "license": "AGPL-3.0-or-later",
+  "type": "module",
+  "engines": {
+    "node": ">=20.10.0",
+    "pnpm": ">=9.0.0"
+  },
+  "packageManager": "pnpm@9.12.0",
+  "scripts": {
+    "build": "turbo run build",
+    "test": "turbo run test",
+    "lint": "turbo run lint",
+    "typecheck": "turbo run typecheck",
+    "validate": "pnpm run validate:deps && pnpm run validate:manifests && pnpm run validate:events && pnpm run validate:rls && pnpm run lint && pnpm run typecheck",
+    "validate:deps": "depcruise --config .dependency-cruiser.cjs apps packages modules",
+    "validate:manifests": "echo 'manifest validator wired in next phase'",
+    "validate:events": "echo 'event catalog validator wired in next phase'",
+    "validate:rls": "echo 'rls checker wired in next phase'",
+    "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md,yml,yaml}\"",
+    "format:check": "prettier --check \"**/*.{ts,tsx,js,jsx,json,md,yml,yaml}\"",
+    "clean": "turbo run clean && rimraf node_modules .turbo"
+  },
+  "devDependencies": {
+    "@sfos/eslint-config": "workspace:*",
+    "@sfos/tsconfig": "workspace:*",
+    "@types/node": "^20.16.10",
+    "dependency-cruiser": "^16.4.2",
+    "eslint": "^9.12.0",
+    "prettier": "^3.3.3",
+    "rimraf": "^6.0.1",
+    "turbo": "^2.1.3",
+    "typescript": "^5.6.2"
+  }
+}

@@ -1,0 +1,20 @@
+# SmartFactory OS — Code Owners
+#
+# Lines later in this file take precedence over earlier ones.
+# Until additional contributors join, the maintainer owns everything.
+# Module-specific ownership entries can be added as community modules land.
+
+* @maintainer
+
+# Architectural foundations require maintainer review even after delegation.
+/docs/architecture/                       @maintainer
+/docs/adr/                                @maintainer
+/packages/contracts/                      @maintainer
+/packages/module-sdk/                     @maintainer
+/.dependency-cruiser.cjs                  @maintainer
+/.eslintrc.cjs                            @maintainer
+/tsconfig.base.json                       @maintainer
+/turbo.json                               @maintainer
+/AGENTS.md                                @maintainer
+/OWNERSHIP.md                             @maintainer
+/CODEOWNERS                               @maintainer
