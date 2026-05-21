@@ -94,8 +94,14 @@ module.exports = {
       name: 'contracts-has-no-internal-deps',
       severity: 'error',
       comment:
-        '@sfos/contracts is the foundation; it must not depend on any other @sfos package.',
-      from: { path: '^packages/contracts/' },
+        '@sfos/contracts is the foundation; it must not depend on any other @sfos package. ' +
+        'The package root eslint.config.{js,mjs,cjs} is a tooling-layer file (consumed only ' +
+        'by ESLint, never bundled into the runtime contract surface) so it may pull in ' +
+        '@sfos/eslint-config without breaking contracts purity.',
+      from: {
+        path: '^packages/contracts/',
+        pathNot: '^packages/contracts/eslint\\.config\\.(js|mjs|cjs)$'
+      },
       to: {
         path: '^(packages|modules|apps)/',
         pathNot: '^packages/contracts/'
