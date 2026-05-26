@@ -1,0 +1,75 @@
+-- NNNN_<module>_<description>.sql
+--
+-- TEMPLATE for module-owned migrations. Copy, rename, drop the placeholders,
+-- file under `modules/<module>/db/migrations/`.
+--
+-- Reminder: NNNN is the GLOBAL migration sequence, not module-local.
+-- See packages/db/drizzle/README.md for the discipline.
+--
+-- This template demonstrates the canonical pattern for adding a
+-- tenant-scoped table:
+--   1. Create the table under the module's schema.
+--   2. Enable + FORCE row-level security.
+--   3. Add SELECT, INSERT, UPDATE, DELETE policies — all tenant-scoped,
+--      all with WITH CHECK on writes.
+--   4. Grant table privileges to app_tenant via the schema's default
+--      privileges (already configured for `core`; modules add their own
+--      ALTER DEFAULT PRIVILEGES once per module schema).
+
+BEGIN;
+
+-- ---------- One-time per module: create the module's schema ----------
+-- Only the FIRST migration in a module's history runs this. Subsequent
+-- migrations reference the schema as already present.
+--
+-- CREATE SCHEMA IF NOT EXISTS <module>;
+-- GRANT USAGE ON SCHEMA <module> TO app_tenant;
+-- ALTER DEFAULT PRIVILEGES IN SCHEMA <module>
+--   GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO app_tenant;
+
+-- ---------- Table ----------
+CREATE TABLE <module>.<entity> (
+  id          uuid        PRIMARY KEY DEFAULT gen_random_uuid(),
+  company_id  uuid        NOT NULL REFERENCES core.companies(id) ON DELETE RESTRICT,
+  -- domain columns here
+  created_at  timestamptz NOT NULL DEFAULT now(),
+  updated_at  timestamptz NOT NULL DEFAULT now()
+);
+
+CREATE INDEX <module>_<entity>_company_idx ON <module>.<entity> (company_id);
+
+CREATE TRIGGER <module>_<entity>_touch_updated_at
+  BEFORE UPDATE ON <module>.<entity>
+  FOR EACH ROW EXECUTE FUNCTION app.touch_updated_at();
+
+-- ---------- RLS ----------
+ALTER TABLE <module>.<entity> ENABLE ROW LEVEL SECURITY;
+ALTER TABLE <module>.<entity> FORCE ROW LEVEL SECURITY;
+
+CREATE POLICY <module>_<entity>_select_in_company ON <module>.<entity>
+  FOR SELECT TO app_tenant
+  USING (company_id = app.current_company_id());
+
+CREATE POLICY <module>_<entity>_insert_in_company ON <module>.<entity>
+  FOR INSERT TO app_tenant
+  WITH CHECK (
+    company_id = app.current_company_id()
+    AND app.current_user_has('<module>.<entity>.create')
+  );
+
+CREATE POLICY <module>_<entity>_update_in_company ON <module>.<entity>
+  FOR UPDATE TO app_tenant
+  USING      (company_id = app.current_company_id())
+  WITH CHECK (
+    company_id = app.current_company_id()
+    AND app.current_user_has('<module>.<entity>.update')
+  );
+
+CREATE POLICY <module>_<entity>_delete_in_company ON <module>.<entity>
+  FOR DELETE TO app_tenant
+  USING (
+    company_id = app.current_company_id()
+    AND app.current_user_has('<module>.<entity>.delete')
+  );
+
+COMMIT;

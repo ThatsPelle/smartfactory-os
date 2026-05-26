@@ -1,0 +1,52 @@
+{
+  "name": "@sfos/iam",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Identity & Access Management module — auth, sessions, invitations, password reset.",
+  "license": "AGPL-3.0-or-later",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./contracts": {
+      "types": "./dist/contracts/index.d.ts",
+      "import": "./dist/contracts/index.js"
+    },
+    "./manifest": {
+      "types": "./dist/manifest.d.ts",
+      "import": "./dist/manifest.js"
+    }
+  },
+  "files": ["dist", "src"],
+  "scripts": {
+    "build": "tsc -b",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint 'src/**/*.ts' 'tests/**/*.ts' --no-error-on-unmatched-pattern",
+    "clean": "rimraf dist .turbo",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "dependencies": {
+    "@node-rs/argon2": "^2.0.0",
+    "@sfos/contracts": "workspace:*",
+    "@sfos/db": "workspace:*",
+    "@sfos/events": "workspace:*",
+    "@sfos/module-sdk": "workspace:*",
+    "drizzle-orm": "^0.36.0",
+    "ulid": "^2.3.0",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@sfos/eslint-config": "workspace:*",
+    "@sfos/tsconfig": "workspace:*",
+    "@types/node": "^20.16.10",
+    "postgres": "^3.4.4",
+    "rimraf": "^6.0.1",
+    "typescript": "^5.6.2",
+    "vitest": "^2.1.0"
+  }
+}

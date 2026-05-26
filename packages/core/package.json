@@ -1,0 +1,63 @@
+{
+  "name": "@sfos/core",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Runtime orchestration foundation: module registry, lifecycle, capabilities, event bus, outbox publisher.",
+  "license": "AGPL-3.0-or-later",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./registry": {
+      "types": "./dist/registry/index.d.ts",
+      "import": "./dist/registry/index.js"
+    },
+    "./lifecycle": {
+      "types": "./dist/lifecycle/index.d.ts",
+      "import": "./dist/lifecycle/index.js"
+    },
+    "./events": {
+      "types": "./dist/events/index.d.ts",
+      "import": "./dist/events/index.js"
+    },
+    "./outbox": {
+      "types": "./dist/outbox/index.d.ts",
+      "import": "./dist/outbox/index.js"
+    },
+    "./diagnostics": {
+      "types": "./dist/diagnostics/index.d.ts",
+      "import": "./dist/diagnostics/index.js"
+    }
+  },
+  "files": ["dist", "src"],
+  "scripts": {
+    "build": "tsc -b",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint src tests",
+    "clean": "rimraf dist .turbo",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "dependencies": {
+    "@sfos/contracts": "workspace:*",
+    "@sfos/db": "workspace:*",
+    "@sfos/events": "workspace:*",
+    "@sfos/module-sdk": "workspace:*",
+    "drizzle-orm": "^0.36.0",
+    "semver": "^7.6.3"
+  },
+  "devDependencies": {
+    "@sfos/eslint-config": "workspace:*",
+    "@sfos/tsconfig": "workspace:*",
+    "@types/node": "^20.16.10",
+    "@types/semver": "^7.5.8",
+    "postgres": "^3.4.4",
+    "rimraf": "^6.0.1",
+    "typescript": "^5.6.2",
+    "vitest": "^2.1.0"
+  }
+}

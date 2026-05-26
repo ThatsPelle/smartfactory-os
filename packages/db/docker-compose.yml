@@ -1,0 +1,41 @@
+# SmartFactory OS — local Postgres for development and adversarial tests.
+#
+# Single service. Self-host friendly. No managed-DB lock-in.
+# Apps connect via DATABASE_URL (see .env.example).
+#
+# Volumes are named so `docker compose down -v` wipes data deterministically.
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: sfos-postgres
+    restart: unless-stopped
+    environment:
+      # Superuser — used ONLY for migrations and admin tooling.
+      # Application connections use the app_tenant role created in migration 0002.
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: sfos_dev
+      # Force UTC at the cluster level so timestamptz comparisons are unambiguous.
+      PGTZ: UTC
+      TZ: UTC
+    command:
+      - postgres
+      - -c
+      - timezone=UTC
+      - -c
+      - log_statement=none
+      - -c
+      - log_min_messages=warning
+    ports:
+      - '5432:5432'
+    volumes:
+      - sfos_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U postgres -d sfos_dev']
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+volumes:
+  sfos_pgdata:
