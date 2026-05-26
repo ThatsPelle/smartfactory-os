@@ -55,7 +55,7 @@ describe.skipIf(!DB_URL)('auth service — integration', () => {
 
   it('login returns tokens for valid credentials', async () => {
     const { userId } = await seedUser(iamClient.db, 'alice@test.example', 'Password123!');
-    const ctx = makeIamCtx(iamClient.db);
+    const { ctx } = makeIamCtx(iamClient.db);
     const result = await login(ctx, { email: 'alice@test.example', password: 'Password123!' });
     expect(result.ok).toBe(true);
     if (!result.ok) return;
@@ -65,7 +65,7 @@ describe.skipIf(!DB_URL)('auth service — integration', () => {
 
   it('login returns invalid_credentials for wrong password', async () => {
     await seedUser(iamClient.db, 'bob@test.example', 'CorrectPassword!');
-    const ctx = makeIamCtx(iamClient.db);
+    const { ctx } = makeIamCtx(iamClient.db);
     const result = await login(ctx, { email: 'bob@test.example', password: 'WrongPassword!' });
     expect(result.ok).toBe(false);
     if (result.ok) return;
@@ -74,7 +74,7 @@ describe.skipIf(!DB_URL)('auth service — integration', () => {
 
   it('validateSession returns output for a valid token', async () => {
     await seedUser(iamClient.db, 'carol@test.example', 'SecurePass123!');
-    const ctx = makeIamCtx(iamClient.db);
+    const { ctx } = makeIamCtx(iamClient.db);
     const loginResult = await login(ctx, { email: 'carol@test.example', password: 'SecurePass123!' });
     expect(loginResult.ok).toBe(true);
     if (!loginResult.ok) return;
@@ -86,7 +86,7 @@ describe.skipIf(!DB_URL)('auth service — integration', () => {
 
   it('validateSession returns session_revoked for a revoked session', async () => {
     const { userId } = await seedUser(iamClient.db, 'dave@test.example', 'SecurePass123!');
-    const ctx = makeIamCtx(iamClient.db, { actorUserId: userId as IamServiceCtx['actorUserId'] });
+    const { ctx } = makeIamCtx(iamClient.db, { actorUserId: userId as IamServiceCtx['actorUserId'] });
     const loginResult = await login(ctx, { email: 'dave@test.example', password: 'SecurePass123!' });
     expect(loginResult.ok).toBe(true);
     if (!loginResult.ok) return;

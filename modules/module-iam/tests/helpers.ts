@@ -25,17 +25,18 @@ const makeLogger = (): IamServiceCtx['logger'] => ({
 export const makeIamCtx = (
   db: IamDb,
   overrides: Partial<IamServiceCtx> = {}
-): IamServiceCtx => {
-  const { events } = makeRecordingEvents();
-  return {
+): { ctx: IamServiceCtx; emitted: EventEnvelope[] } => {
+  const { events, emitted } = makeRecordingEvents();
+  const ctx: IamServiceCtx = {
     companyId: TEST_COMPANY_ID as IamServiceCtx['companyId'],
     systemDb: db,
     tenantDb: db as unknown as IamServiceCtx['tenantDb'],
     events,
-    logger: makeLogger(),
+    logger: makeLogger() as IamServiceCtx['logger'],
     correlationId: 'test-corr-id',
     ...overrides
   };
+  return { ctx, emitted };
 };
 
 export const seedUser = async (

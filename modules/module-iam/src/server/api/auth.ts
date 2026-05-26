@@ -1,6 +1,6 @@
 import { eq, sql } from 'drizzle-orm';
 import { newULID } from '@sfos/events';
-import { Ok, Err } from '@sfos/contracts/result';
+import { Ok, Err, OkVoid } from '@sfos/contracts/result';
 import type { Result } from '@sfos/contracts/result';
 
 import { verifyPassword } from '../../internal/password-hash.js';
@@ -146,6 +146,11 @@ export const logout = async (
     return Err({ code: 'session_not_found' });
   }
 
+  // Don't re-revoke an already-revoked session.
+  if (session.revokedAt !== null) {
+    return Err({ code: 'session_revoked' });
+  }
+
   await systemDb.update(sessions)
     .set({ revokedAt: new Date() })
     .where(eq(sessions.id, input.sessionId));
@@ -161,7 +166,7 @@ export const logout = async (
     audit_required: true
   }));
 
-  return Ok(undefined as unknown as void);
+  return OkVoid();
 };
 
 export const validateSession = async (

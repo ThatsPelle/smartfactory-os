@@ -23,3 +23,6 @@ export const unwrap = <T, E>(r: Result<T, E>): T => {
   if (r.ok) return r.value;
   throw r.error instanceof Error ? r.error : new Error(String(r.error));
 };
+
+/** Convenience factory for `Result<void, never>` — avoids `Ok(undefined as unknown as void)` casts. */
+export const OkVoid = (): Result<void, never> => ({ ok: true, value: undefined as void });
