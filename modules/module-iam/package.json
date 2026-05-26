@@ -37,6 +37,7 @@
     "@sfos/events": "workspace:*",
     "@sfos/module-sdk": "workspace:*",
     "drizzle-orm": "^0.36.0",
+    "postgres": "^3.4.4",
     "ulid": "^2.3.0",
     "zod": "^3.23.8"
   },
@@ -44,7 +45,6 @@
     "@sfos/eslint-config": "workspace:*",
     "@sfos/tsconfig": "workspace:*",
     "@types/node": "^20.16.10",
-    "postgres": "^3.4.4",
     "rimraf": "^6.0.1",
     "typescript": "^5.6.2",
     "vitest": "^2.1.0"

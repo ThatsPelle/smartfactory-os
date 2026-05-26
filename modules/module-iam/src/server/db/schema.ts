@@ -3,12 +3,13 @@ import {
   boolean,
   inet,
   integer,
-  pgEnum,
   pgSchema,
   text,
   timestamp,
   uuid
 } from 'drizzle-orm/pg-core';
+
+import { membershipRole as membershipRoleEnum } from '@sfos/db/schema';
 
 const iamSchema = pgSchema('module_iam');
 
@@ -17,13 +18,6 @@ export const invitationStatusEnum = iamSchema.enum('invitation_status', [
   'accepted',
   'revoked',
   'expired'
-]);
-
-export const membershipRoleEnum = pgEnum('membership_role', [
-  'owner',
-  'admin',
-  'member',
-  'viewer'
 ]);
 
 export const credentials = iamSchema.table('credentials', {
@@ -37,6 +31,7 @@ export const credentials = iamSchema.table('credentials', {
     .notNull()
     .default(sql`now()`),
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().default(sql`now()`),
+  // Managed by credentials_touch_updated_at trigger; never set explicitly.
   updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().default(sql`now()`)
 });
 
@@ -53,6 +48,7 @@ export const sessions = iamSchema.table('sessions', {
   ipAddress: inet('ip_address'),
   userAgent: text('user_agent'),
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().default(sql`now()`),
+  // Managed by sessions_touch_updated_at trigger; never set explicitly.
   updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().default(sql`now()`)
 });
 

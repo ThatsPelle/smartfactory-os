@@ -1,9 +1,9 @@
-import { drizzle } from 'drizzle-orm/postgres-js';
+import { drizzle, type PostgresJsDatabase } from 'drizzle-orm/postgres-js';
 import postgres from 'postgres';
 
 import * as schema from './schema.js';
 
-export type IamDb = ReturnType<typeof drizzle<typeof schema>>;
+export type IamDb = PostgresJsDatabase<typeof schema>;
 
 export interface IamClient {
   readonly db: IamDb;
