@@ -19,6 +19,11 @@ GRANT USAGE ON SCHEMA module_iam TO module_iam_role;
 GRANT USAGE ON SCHEMA core       TO module_iam_role;
 GRANT USAGE ON SCHEMA app        TO module_iam_role;
 
+GRANT EXECUTE ON FUNCTION app.touch_updated_at()     TO module_iam_role;
+GRANT EXECUTE ON FUNCTION app.current_user_id()      TO module_iam_role;
+GRANT EXECUTE ON FUNCTION app.current_company_id()   TO module_iam_role;
+GRANT EXECUTE ON FUNCTION app.current_user_has(text) TO module_iam_role;
+
 -- module_iam_role owns all objects it creates in module_iam.
 ALTER DEFAULT PRIVILEGES IN SCHEMA module_iam
   GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO module_iam_role;

@@ -32,12 +32,12 @@ CREATE TABLE module_iam.sessions (
   id                    text        PRIMARY KEY,
   user_id               uuid        NOT NULL REFERENCES core.users(id)     ON DELETE CASCADE,
   company_id            uuid        NOT NULL REFERENCES core.companies(id) ON DELETE CASCADE,
-  access_token_hash     text        NOT NULL,
-  refresh_token_hash    text        NOT NULL,
+  access_token_hash     text        NOT NULL UNIQUE,
+  refresh_token_hash    text        NOT NULL UNIQUE,
   expires_at            timestamptz NOT NULL,
   refresh_expires_at    timestamptz NOT NULL,
   revoked_at            timestamptz,
-  rotated_from_session_id text,
+  rotated_from_session_id text REFERENCES module_iam.sessions(id) ON DELETE SET NULL,
   ip_address            inet,
   user_agent            text,
   created_at            timestamptz NOT NULL DEFAULT now(),
@@ -75,16 +75,16 @@ CREATE TABLE module_iam.invitations (
   revoked_by    uuid                         REFERENCES core.users(id),
   created_at    timestamptz                  NOT NULL DEFAULT now(),
   CONSTRAINT invitations_email_lower
-    CHECK (invited_email = lower(invited_email)),
-  CONSTRAINT invitations_single_pending
-    UNIQUE NULLS NOT DISTINCT (company_id, invited_email, status)
+    CHECK (invited_email = lower(invited_email))
 );
 
 CREATE INDEX invitations_company_status_idx ON module_iam.invitations (company_id, status);
-CREATE INDEX invitations_token_hash_idx     ON module_iam.invitations (token_hash);
+CREATE UNIQUE INDEX invitations_single_pending_idx
+  ON module_iam.invitations (company_id, invited_email)
+  WHERE status = 'pending';
 
 -- Prevent status regression: once accepted/revoked, cannot go back to pending.
-CREATE OR REPLACE FUNCTION app.invitations_guard_status()
+CREATE OR REPLACE FUNCTION module_iam.invitations_guard_status()
 RETURNS trigger LANGUAGE plpgsql AS $$
 BEGIN
   IF OLD.status IN ('accepted', 'revoked') AND NEW.status <> OLD.status THEN
@@ -94,9 +94,11 @@ BEGIN
   RETURN NEW;
 END $$;
 
+GRANT EXECUTE ON FUNCTION module_iam.invitations_guard_status() TO app_tenant;
+
 CREATE TRIGGER invitations_guard_status
   BEFORE UPDATE ON module_iam.invitations
-  FOR EACH ROW EXECUTE FUNCTION app.invitations_guard_status();
+  FOR EACH ROW EXECUTE FUNCTION module_iam.invitations_guard_status();
 
 -- ---------- module_iam.password_reset_tokens ----------
 -- Append-only. Consuming sets consumed_at; rows are never deleted during TTL.
