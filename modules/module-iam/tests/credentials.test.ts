@@ -6,7 +6,8 @@ import {
   isLocked,
   nextLockoutState,
   resetLockoutState,
-  LOCKOUT_THRESHOLD
+  LOCKOUT_THRESHOLD,
+  LOCKOUT_DURATION_MS
 } from '../src/internal/lockout.js';
 
 describe('password-hash', () => {
@@ -47,35 +48,51 @@ describe('crypto-compare', () => {
 });
 
 describe('lockout', () => {
+  const NOW = 1_000_000_000_000; // fixed ms timestamp for deterministic tests
+
   it('not locked with zero attempts', () => {
-    expect(isLocked({ failedAttempts: 0, lockedUntil: null })).toBe(false);
+    expect(isLocked({ failedAttempts: 0, lockedUntil: null }, NOW)).toBe(false);
   });
 
   it('not locked below threshold', () => {
     let state = resetLockoutState();
     for (let i = 0; i < LOCKOUT_THRESHOLD - 1; i++) {
-      state = nextLockoutState(state);
+      state = nextLockoutState(state, NOW);
     }
-    expect(isLocked(state)).toBe(false);
+    expect(isLocked(state, NOW)).toBe(false);
   });
 
   it('locks at threshold', () => {
     let state = resetLockoutState();
     for (let i = 0; i < LOCKOUT_THRESHOLD; i++) {
-      state = nextLockoutState(state);
+      state = nextLockoutState(state, NOW);
     }
-    expect(isLocked(state)).toBe(true);
+    expect(isLocked(state, NOW)).toBe(true);
     expect(state.lockedUntil).not.toBeNull();
+    // lockedUntil should be exactly 15 minutes after NOW
+    expect(state.lockedUntil!.getTime()).toBe(NOW + LOCKOUT_DURATION_MS);
   });
 
   it('expired lock is not active', () => {
-    const past = new Date(Date.now() - 1);
-    expect(isLocked({ failedAttempts: 10, lockedUntil: past })).toBe(false);
+    const past = new Date(NOW - 1);
+    expect(isLocked({ failedAttempts: 10, lockedUntil: past }, NOW)).toBe(false);
   });
 
   it('resetLockoutState clears everything', () => {
     const state = resetLockoutState();
     expect(state.failedAttempts).toBe(0);
     expect(state.lockedUntil).toBeNull();
+  });
+
+  it('additional failed attempts past threshold extend lockedUntil', () => {
+    let state = resetLockoutState();
+    for (let i = 0; i < LOCKOUT_THRESHOLD; i++) {
+      state = nextLockoutState(state, NOW);
+    }
+    // One more attempt after lock — lockedUntil updated with a later NOW
+    const laterNow = NOW + 1000;
+    const extended = nextLockoutState(state, laterNow);
+    expect(extended.lockedUntil!.getTime()).toBe(laterNow + LOCKOUT_DURATION_MS);
+    expect(extended.failedAttempts).toBe(LOCKOUT_THRESHOLD + 1);
   });
 });

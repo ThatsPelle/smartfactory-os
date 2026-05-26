@@ -6,15 +6,15 @@ export interface LockoutState {
   readonly lockedUntil: Date | null;
 }
 
-export const isLocked = (state: LockoutState): boolean => {
+export const isLocked = (state: LockoutState, now = Date.now()): boolean => {
   if (state.lockedUntil === null) return false;
-  return state.lockedUntil > new Date();
+  return state.lockedUntil.getTime() > now;
 };
 
-export const nextLockoutState = (current: LockoutState): LockoutState => {
+export const nextLockoutState = (current: LockoutState, now = Date.now()): LockoutState => {
   const failedAttempts = current.failedAttempts + 1;
   if (failedAttempts >= LOCKOUT_THRESHOLD) {
-    return { failedAttempts, lockedUntil: new Date(Date.now() + LOCKOUT_DURATION_MS) };
+    return { failedAttempts, lockedUntil: new Date(now + LOCKOUT_DURATION_MS) };
   }
   return { failedAttempts, lockedUntil: null };
 };

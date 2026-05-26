@@ -1,19 +1,14 @@
-import { timingSafeEqual } from 'node:crypto';
+import { timingSafeEqual, createHash } from 'node:crypto';
 
 /**
- * Constant-time string equality. Returns false for different lengths without
- * leaking length information via early exit.
+ * Constant-time string equality via SHA-256 pre-hashing.
+ * Both inputs are hashed to a fixed 32-byte digest before comparison,
+ * so the timingSafeEqual call is always on equal-length buffers.
  *
  * Use for all token hash comparisons to prevent timing attacks.
  */
 export const safeEqual = (a: string, b: string): boolean => {
-  const bufA = Buffer.from(a, 'utf8');
-  const bufB = Buffer.from(b, 'utf8');
-  if (bufA.length !== bufB.length) {
-    // Still run timingSafeEqual against a dummy buffer of same length as bufA
-    // to avoid leaking bufA.length via timing.
-    timingSafeEqual(bufA, Buffer.alloc(bufA.length));
-    return false;
-  }
-  return timingSafeEqual(bufA, bufB);
+  const hashA = createHash('sha256').update(a, 'utf8').digest();
+  const hashB = createHash('sha256').update(b, 'utf8').digest();
+  return timingSafeEqual(hashA, hashB);
 };
