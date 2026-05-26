@@ -33,7 +33,7 @@ export const createInvitation = async (
     })
     .returning();
 
-  if (!inv) return Err({ code: 'user_not_found' });
+  if (!inv) return Err({ code: 'invitation_not_found' });
 
   await events.emit(buildIamEnvelope({
     type: IAM_EVENTS.INVITATION_CREATED,
@@ -81,7 +81,9 @@ export const acceptInvitation = async (
 
   if (!consumed[0]) {
     const existing = await systemDb.execute(sql`
-      SELECT status FROM module_iam.invitations WHERE token_hash = ${tokenHash} LIMIT 1
+      SELECT status FROM module_iam.invitations
+      WHERE token_hash = ${tokenHash} AND company_id = ${companyId as string}::uuid
+      LIMIT 1
     `) as Array<{ status: string }>;
 
     if (!existing[0]) return Err({ code: 'invitation_not_found' });
