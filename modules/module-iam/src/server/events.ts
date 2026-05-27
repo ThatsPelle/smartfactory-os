@@ -10,8 +10,9 @@ export const IAM_EVENTS = {
   INVITATION_CREATED:          'iam.invitation.created',
   INVITATION_ACCEPTED:         'iam.invitation.accepted',
   INVITATION_REVOKED:          'iam.invitation.revoked',
-  CREDENTIAL_PASSWORD_CHANGED: 'iam.credential.password_changed',
-  CREDENTIAL_LOCKED:           'iam.credential.locked',
+  CREDENTIAL_PASSWORD_CHANGED:          'iam.credential.password_changed',
+  CREDENTIAL_LOCKED:                    'iam.credential.locked',
+  CREDENTIAL_PASSWORD_RESET_REQUESTED:  'iam.credential.password_reset_requested',
 } as const;
 
 export type IamEventType = (typeof IAM_EVENTS)[keyof typeof IAM_EVENTS];
