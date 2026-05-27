@@ -60,7 +60,7 @@ suite('adversarial tenancy', () => {
   // ============================================================================
   // SELECT — cross-tenant read
   // ============================================================================
-  it('rejects: reading the other tenant\'s memberships', async () => {
+  it("rejects: reading the other tenant's memberships", async () => {
     const rows = await withTenantContext(
       clients.tenant.db,
       { companyId: asCompanyId(seed.companyA.id), userId: asUserId(seed.alice.id) },
@@ -71,7 +71,7 @@ suite('adversarial tenancy', () => {
     expect(rows.some((r) => r.companyId === seed.companyB.id)).toBe(false);
   });
 
-  it('rejects: reading the other tenant\'s company row', async () => {
+  it("rejects: reading the other tenant's company row", async () => {
     const rows = await withTenantContext(
       clients.tenant.db,
       { companyId: asCompanyId(seed.companyA.id), userId: asUserId(seed.alice.id) },
@@ -197,19 +197,17 @@ suite('adversarial tenancy', () => {
     );
 
     // Admin (BYPASSRLS) tries to mutate — trigger still raises.
-    await expect(
-      clients.admin.sql`UPDATE core.audit_logs SET action = 'tampered'`
-    ).rejects.toThrow(/append-only/i);
+    await expect(clients.admin.sql`UPDATE core.audit_logs SET action = 'tampered'`).rejects.toThrow(
+      /append-only/i
+    );
 
-    await expect(
-      clients.admin.sql`DELETE FROM core.audit_logs`
-    ).rejects.toThrow(/append-only/i);
+    await expect(clients.admin.sql`DELETE FROM core.audit_logs`).rejects.toThrow(/append-only/i);
   });
 
   // ============================================================================
   // Outbox tenant isolation (SELECT)
   // ============================================================================
-  it('rejects: enumerating the other tenant\'s outbox events', async () => {
+  it("rejects: enumerating the other tenant's outbox events", async () => {
     // Admin seeds an outbox row for B.
     await clients.admin.sql`
       INSERT INTO core.outbox_events
@@ -249,9 +247,7 @@ suite('adversarial tenancy', () => {
 
     // Immediately after, on the SAME pooled client, do a context-free query.
     // RLS must see NULL again — `SET LOCAL` lifetime is the transaction.
-    const orphaned = await clients.tenant.db.execute(
-      sql`SELECT app.current_company_id() AS cid`
-    );
+    const orphaned = await clients.tenant.db.execute(sql`SELECT app.current_company_id() AS cid`);
     expect(orphaned[0]!['cid']).toBeNull();
   });
 });

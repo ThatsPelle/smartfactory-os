@@ -22,9 +22,7 @@ describe('lifecycle state machine', () => {
   it('rejects an illegal transition with a typed error', () => {
     const e = new LifecycleEngine();
     e.introduce('m1');
-    expect(() => e.transition('m1', 'initialized')).toThrowError(
-      IllegalLifecycleTransitionError
-    );
+    expect(() => e.transition('m1', 'initialized')).toThrowError(IllegalLifecycleTransitionError);
     expect(e.stateOf('m1')).toBe('discovered'); // unchanged
   });
 
@@ -50,9 +48,7 @@ describe('lifecycle state machine', () => {
     e.introduce('m1');
     e.transition('m1', 'disabled');
     expect(allowedTransitions('disabled')).toEqual([]);
-    expect(() => e.transition('m1', 'validated')).toThrowError(
-      IllegalLifecycleTransitionError
-    );
+    expect(() => e.transition('m1', 'validated')).toThrowError(IllegalLifecycleTransitionError);
   });
 
   it('records history with from/to/reason/at', () => {
@@ -71,7 +67,7 @@ describe('lifecycle state machine', () => {
     expect(() => e.introduce('m1')).toThrow();
   });
 
-  it('canTransition matches the engine\'s allowed transitions', () => {
+  it("canTransition matches the engine's allowed transitions", () => {
     expect(canTransition('discovered', 'validated')).toBe(true);
     expect(canTransition('discovered', 'initialized')).toBe(false);
     expect(canTransition('failed', 'disabled')).toBe(true);

@@ -4,13 +4,13 @@ Shared TypeScript configurations.
 
 ## Variants
 
-| Variant | When to use |
-|---|---|
-| `base` | Anything; pure type-checking, no emit settings |
-| `lib` | Library packages that emit `dist/` with declaration files |
-| `node` | Node-targeted libraries (ESM, NodeNext resolution) |
-| `app` | Apps (no emit; bundler handles output) |
-| `react` | React apps (JSX + DOM libs) |
+| Variant | When to use                                               |
+| ------- | --------------------------------------------------------- |
+| `base`  | Anything; pure type-checking, no emit settings            |
+| `lib`   | Library packages that emit `dist/` with declaration files |
+| `node`  | Node-targeted libraries (ESM, NodeNext resolution)        |
+| `app`   | Apps (no emit; bundler handles output)                    |
+| `react` | React apps (JSX + DOM libs)                               |
 
 ## Usage
 

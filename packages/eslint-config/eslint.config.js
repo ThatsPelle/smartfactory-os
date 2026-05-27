@@ -13,7 +13,4 @@ import nodeConfig from './src/configs/node.js';
  *
  * @type {import('eslint').Linter.Config[]}
  */
-export default [
-  { ignores: ['dist/**', '.turbo/**'] },
-  ...nodeConfig
-];
+export default [{ ignores: ['dist/**', '.turbo/**'] }, ...nodeConfig];

@@ -10,7 +10,12 @@ import { buildIamEnvelope, IAM_EVENTS, userActor } from '../events.js';
 import { INVITE_TTL_MS } from '../constants.js';
 import type { IamServiceCtx } from '../context.js';
 import type { IamError } from '../errors.js';
-import type { InviteInput, InviteView, AcceptInvitationInput, RevokeInvitationInput } from '../../contracts/invite.js';
+import type {
+  InviteInput,
+  InviteView,
+  AcceptInvitationInput,
+  RevokeInvitationInput
+} from '../../contracts/invite.js';
 
 export const createInvitation = async (
   ctx: IamServiceCtx,
@@ -35,16 +40,18 @@ export const createInvitation = async (
 
   if (!inv) return Err({ code: 'invitation_not_found' });
 
-  await events.emit(buildIamEnvelope({
-    type: IAM_EVENTS.INVITATION_CREATED,
-    version: '1.0',
-    company_id: companyId,
-    emitted_by: userActor(actorUserId as string),
-    correlation_id: correlationId,
-    source_entity_id: inv.id,
-    payload: { invitationId: inv.id, email: input.email, role: input.role },
-    audit_required: true
-  }));
+  await events.emit(
+    buildIamEnvelope({
+      type: IAM_EVENTS.INVITATION_CREATED,
+      version: '1.0',
+      company_id: companyId,
+      emitted_by: userActor(actorUserId as string),
+      correlation_id: correlationId,
+      source_entity_id: inv.id,
+      payload: { invitationId: inv.id, email: input.email, role: input.role },
+      audit_required: true
+    })
+  );
 
   return Ok({
     token,
@@ -68,7 +75,7 @@ export const acceptInvitation = async (
   const tokenHash = hashToken(input.token);
 
   // Atomic consume: only updates the row if status = 'pending' AND not expired.
-  const consumed = await systemDb.execute(sql`
+  const consumed = (await systemDb.execute(sql`
     UPDATE module_iam.invitations
     SET    status      = 'accepted',
            accepted_at = now(),
@@ -77,18 +84,24 @@ export const acceptInvitation = async (
       AND  status      = 'pending'
       AND  expires_at  > now()
     RETURNING id, company_id, invited_email, invited_role, status
-  `) as Array<{ id: string; company_id: string; invited_email: string; invited_role: string; status: string }>;
+  `)) as Array<{
+    id: string;
+    company_id: string;
+    invited_email: string;
+    invited_role: string;
+    status: string;
+  }>;
 
   if (!consumed[0]) {
-    const existing = await systemDb.execute(sql`
+    const existing = (await systemDb.execute(sql`
       SELECT status FROM module_iam.invitations
       WHERE token_hash = ${tokenHash} AND company_id = ${companyId as string}::uuid
       LIMIT 1
-    `) as Array<{ status: string }>;
+    `)) as Array<{ status: string }>;
 
     if (!existing[0]) return Err({ code: 'invitation_not_found' });
     if (existing[0].status === 'accepted') return Err({ code: 'invitation_already_accepted' });
-    if (existing[0].status === 'revoked')  return Err({ code: 'invitation_already_revoked' });
+    if (existing[0].status === 'revoked') return Err({ code: 'invitation_already_revoked' });
     return Err({ code: 'invitation_expired' });
   }
 
@@ -107,16 +120,18 @@ export const acceptInvitation = async (
     }
   );
 
-  await events.emit(buildIamEnvelope({
-    type: IAM_EVENTS.INVITATION_ACCEPTED,
-    version: '1.0',
-    company_id: companyId,
-    emitted_by: userActor(input.acceptingUserId),
-    correlation_id: correlationId,
-    source_entity_id: inv.id,
-    payload: { invitationId: inv.id, acceptedBy: input.acceptingUserId, role: inv.invited_role },
-    audit_required: true
-  }));
+  await events.emit(
+    buildIamEnvelope({
+      type: IAM_EVENTS.INVITATION_ACCEPTED,
+      version: '1.0',
+      company_id: companyId,
+      emitted_by: userActor(input.acceptingUserId),
+      correlation_id: correlationId,
+      source_entity_id: inv.id,
+      payload: { invitationId: inv.id, acceptedBy: input.acceptingUserId, role: inv.invited_role },
+      audit_required: true
+    })
+  );
 
   return OkVoid();
 };
@@ -127,7 +142,7 @@ export const revokeInvitation = async (
 ): Promise<Result<void, IamError>> => {
   const { systemDb, events, correlationId, companyId, actorUserId } = ctx;
 
-  const revoked = await systemDb.execute(sql`
+  const revoked = (await systemDb.execute(sql`
     UPDATE module_iam.invitations
     SET    status     = 'revoked',
            revoked_at = now(),
@@ -136,30 +151,32 @@ export const revokeInvitation = async (
       AND  company_id = ${companyId as string}::uuid
       AND  status     = 'pending'
     RETURNING id
-  `) as Array<{ id: string }>;
+  `)) as Array<{ id: string }>;
 
   if (!revoked[0]) {
-    const existing = await systemDb.execute(sql`
+    const existing = (await systemDb.execute(sql`
       SELECT status FROM module_iam.invitations
       WHERE id = ${input.invitationId}::uuid AND company_id = ${companyId as string}::uuid LIMIT 1
-    `) as Array<{ status: string }>;
+    `)) as Array<{ status: string }>;
 
     if (!existing[0]) return Err({ code: 'invitation_not_found' });
-    if (existing[0].status === 'revoked')  return Err({ code: 'invitation_already_revoked' });
+    if (existing[0].status === 'revoked') return Err({ code: 'invitation_already_revoked' });
     if (existing[0].status === 'accepted') return Err({ code: 'invitation_already_accepted' });
     return Err({ code: 'invitation_expired' });
   }
 
-  await events.emit(buildIamEnvelope({
-    type: IAM_EVENTS.INVITATION_REVOKED,
-    version: '1.0',
-    company_id: companyId,
-    emitted_by: userActor(actorUserId as string),
-    correlation_id: correlationId,
-    source_entity_id: revoked[0].id,
-    payload: { invitationId: revoked[0].id, revokedBy: actorUserId },
-    audit_required: true
-  }));
+  await events.emit(
+    buildIamEnvelope({
+      type: IAM_EVENTS.INVITATION_REVOKED,
+      version: '1.0',
+      company_id: companyId,
+      emitted_by: userActor(actorUserId as string),
+      correlation_id: correlationId,
+      source_entity_id: revoked[0].id,
+      payload: { invitationId: revoked[0].id, revokedBy: actorUserId },
+      audit_required: true
+    })
+  );
 
   return OkVoid();
 };

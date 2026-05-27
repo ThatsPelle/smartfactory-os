@@ -74,7 +74,7 @@ files exist; in three months, it would be thirty.
 ### Negative
 
 - **No deep merging of rule options.** When the same rule appears in multiple
-  config objects in the array, the later one *replaces* the former. We
+  config objects in the array, the later one _replaces_ the former. We
   re-declare `no-restricted-imports` patterns in the React preset rather than
   inheriting them. Slightly more verbose; explicit beats clever.
 - **`globals` package adds a small dep**, replacing the previous `env` config.
@@ -92,17 +92,17 @@ files exist; in three months, it would be thirty.
 
 ## Alternatives considered
 
-| Option | Why not |
-|---|---|
-| Downgrade to ESLint 8.x | Maintenance-only; new plugins assume v9; debt grows. |
-| Keep `.eslintrc.cjs` with `ESLINT_USE_FLAT_CONFIG=false` | Pins us to a deprecated path; every CI run carries the env-var override; new contributors trip over it. |
-| Use only the root flat config (no per-package configs) | Removes per-package overrides; the React preset's UI-specific `no-restricted-imports` wouldn't apply cleanly. Per-package configs are the documented flat-config pattern for monorepos. |
-| Use `eslint-plugin-import` (vanilla) | Works in flat config but the resolver setup is awkward and the maintenance signal is weaker than `-x`. |
-| Adopt `typescript-eslint` type-checked rules now | Defer — type-aware rules need per-package `parserOptions.project` and noticeably slow the lint pass. Opt in per package later if value emerges. |
+| Option                                                   | Why not                                                                                                                                                                                 |
+| -------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Downgrade to ESLint 8.x                                  | Maintenance-only; new plugins assume v9; debt grows.                                                                                                                                    |
+| Keep `.eslintrc.cjs` with `ESLINT_USE_FLAT_CONFIG=false` | Pins us to a deprecated path; every CI run carries the env-var override; new contributors trip over it.                                                                                 |
+| Use only the root flat config (no per-package configs)   | Removes per-package overrides; the React preset's UI-specific `no-restricted-imports` wouldn't apply cleanly. Per-package configs are the documented flat-config pattern for monorepos. |
+| Use `eslint-plugin-import` (vanilla)                     | Works in flat config but the resolver setup is awkward and the maintenance signal is weaker than `-x`.                                                                                  |
+| Adopt `typescript-eslint` type-checked rules now         | Defer — type-aware rules need per-package `parserOptions.project` and noticeably slow the lint pass. Opt in per package later if value emerges.                                         |
 
 ## How architectural rules evolve from here
 
-The migration didn't change *what* rules we enforce; it changed *how* they
+The migration didn't change _what_ rules we enforce; it changed _how_ they
 are configured. The architectural enforcement strategy remains:
 
 1. **dependency-cruiser** — the inter-package graph. Cross-module imports,

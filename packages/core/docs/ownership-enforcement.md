@@ -63,8 +63,8 @@ the check from inside a handler.
 ## What ownership does NOT cover
 
 - **Read access.** Any subscribed handler can read any event whose
-  pattern matches; ownership is about who may *emit*, not who may
-  *receive*. Tenant scope is enforced separately through the envelope's
+  pattern matches; ownership is about who may _emit_, not who may
+  _receive_. Tenant scope is enforced separately through the envelope's
   `company_id` and RLS on outbox reads.
 - **Payload contracts.** Ownership says "module A emitted this." It does
   not validate the payload against `events_produced[i].payload_schema`.
@@ -77,9 +77,9 @@ the check from inside a handler.
 
 ## Surface in code
 
-| File | Role |
-| --- | --- |
-| `src/events/ownership.ts` | `ForeignEmissionError`, `UndeclaredEmissionError` |
-| `src/events/bus.ts` | `emit` performs the check before dispatch |
-| `src/runtime/bootstrap.ts` | per-tenant `events.emit` wrapper re-checks the source |
-| (future) DB RLS on `core.outbox_events` | matching enforcement at the row layer |
+| File                                    | Role                                                  |
+| --------------------------------------- | ----------------------------------------------------- |
+| `src/events/ownership.ts`               | `ForeignEmissionError`, `UndeclaredEmissionError`     |
+| `src/events/bus.ts`                     | `emit` performs the check before dispatch             |
+| `src/runtime/bootstrap.ts`              | per-tenant `events.emit` wrapper re-checks the source |
+| (future) DB RLS on `core.outbox_events` | matching enforcement at the row layer                 |

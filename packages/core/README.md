@@ -21,13 +21,7 @@ import time, stop — that is not the shape of this runtime.
 ## Public surface
 
 ```ts
-import {
-  bootstrap,
-  EventBus,
-  OutboxPublisher,
-  AuditSink,
-  renderDiagnostics
-} from '@sfos/core';
+import { bootstrap, EventBus, OutboxPublisher, AuditSink, renderDiagnostics } from '@sfos/core';
 
 const { registry, bus, engine, diagnostics } = await bootstrap({
   platformVersion: '0.1.0',

@@ -14,7 +14,9 @@
     "./tests": "./src/configs/tests.js",
     "./plugin-architecture": "./src/plugin-architecture.js"
   },
-  "files": ["src"],
+  "files": [
+    "src"
+  ],
   "scripts": {
     "lint": "eslint src",
     "typecheck": "echo 'no compile step; .js files type-check via JSDoc only'"

@@ -19,12 +19,12 @@ export const requestPasswordReset = async (
 
   // Single JOIN ensures user exists AND is a member of this company.
   // Returns Ok(null) for unknown email OR non-member — no user enumeration.
-  const userRows = await systemDb.execute(
+  const userRows = (await systemDb.execute(
     sql`SELECT u.id FROM core.users u
         JOIN core.memberships m ON m.user_id = u.id AND m.company_id = ${companyId as string}::uuid
         WHERE lower(u.email) = ${input.email.toLowerCase()}
         LIMIT 1`
-  ) as Array<{ id: string }>;
+  )) as Array<{ id: string }>;
 
   if (!userRows[0]) return Ok(null);
   const userId = userRows[0].id;
@@ -36,15 +36,17 @@ export const requestPasswordReset = async (
     expiresAt: new Date(Date.now() + RESET_TOKEN_TTL_MS)
   });
 
-  await events.emit(buildIamEnvelope({
-    type: IAM_EVENTS.CREDENTIAL_PASSWORD_RESET_REQUESTED,
-    version: '1.0',
-    company_id: companyId,
-    emitted_by: systemActor(),
-    correlation_id: correlationId,
-    payload: { userId },
-    audit_required: true
-  }));
+  await events.emit(
+    buildIamEnvelope({
+      type: IAM_EVENTS.CREDENTIAL_PASSWORD_RESET_REQUESTED,
+      version: '1.0',
+      company_id: companyId,
+      emitted_by: systemActor(),
+      correlation_id: correlationId,
+      payload: { userId },
+      audit_required: true
+    })
+  );
 
   return Ok({ token });
 };
@@ -58,13 +60,13 @@ export const consumePasswordReset = async (
 
   // SELECT FOR UPDATE + UPDATE in one transaction — prevents double-consume race.
   const result = await systemDb.transaction(async (tx) => {
-    const rows = await tx.execute(sql`
+    const rows = (await tx.execute(sql`
       SELECT id, user_id, consumed_at, expires_at
       FROM module_iam.password_reset_tokens
       WHERE token_hash = ${tokenHash}
       LIMIT 1
       FOR UPDATE
-    `) as Array<{ id: string; user_id: string; consumed_at: unknown; expires_at: unknown }>;
+    `)) as Array<{ id: string; user_id: string; consumed_at: unknown; expires_at: unknown }>;
 
     if (!rows[0]) return Err<IamError>({ code: 'reset_token_invalid' });
     const row = rows[0];
@@ -81,7 +83,8 @@ export const consumePasswordReset = async (
     `);
 
     const newHash = await hashPassword(input.newPassword);
-    const credRows = await tx.update(credentials)
+    const credRows = await tx
+      .update(credentials)
       .set({
         passwordHash: newHash,
         lastPasswordChangedAt: new Date(),
@@ -98,15 +101,17 @@ export const consumePasswordReset = async (
 
   if (!result.ok) return Err(result.error);
 
-  await events.emit(buildIamEnvelope({
-    type: IAM_EVENTS.CREDENTIAL_PASSWORD_CHANGED,
-    version: '1.0',
-    company_id: companyId,
-    emitted_by: userActor(result.value),
-    correlation_id: correlationId,
-    payload: { userId: result.value, method: 'reset' },
-    audit_required: true
-  }));
+  await events.emit(
+    buildIamEnvelope({
+      type: IAM_EVENTS.CREDENTIAL_PASSWORD_CHANGED,
+      version: '1.0',
+      company_id: companyId,
+      emitted_by: userActor(result.value),
+      correlation_id: correlationId,
+      payload: { userId: result.value, method: 'reset' },
+      audit_required: true
+    })
+  );
 
   return OkVoid();
 };

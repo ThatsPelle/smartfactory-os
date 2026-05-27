@@ -25,7 +25,13 @@
       "import": "./dist/client.js"
     }
   },
-  "files": ["dist", "src", "drizzle", "docker-compose.yml", ".env.example"],
+  "files": [
+    "dist",
+    "src",
+    "drizzle",
+    "docker-compose.yml",
+    ".env.example"
+  ],
   "scripts": {
     "build": "tsc -b",
     "typecheck": "tsc --noEmit",

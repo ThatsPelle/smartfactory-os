@@ -3,7 +3,10 @@ import { z } from 'zod';
 const MembershipRoleSchema = z.enum(['owner', 'admin', 'member', 'viewer']);
 
 export const InviteInputSchema = z.object({
-  email: z.string().email().transform((e) => e.toLowerCase()),
+  email: z
+    .string()
+    .email()
+    .transform((e) => e.toLowerCase()),
   role: MembershipRoleSchema.default('member')
 });
 export type InviteInput = z.infer<typeof InviteInputSchema>;

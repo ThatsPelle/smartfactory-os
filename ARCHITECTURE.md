@@ -24,13 +24,13 @@ This is the one-page summary. The full corpus is in `docs/architecture/`.
 
 ## Stability tiers
 
-| Tier | Examples | Change cost |
-|---|---|---|
-| Trunk | tenancy, IAM, event bus | very high |
-| Engine | workspace engine, audit sink, notifications | high |
-| Modules | warehouse, production, … | independent |
-| Module SDK | the plugin contract | high |
-| Infrastructure | storage, queue, gateway | moderate |
+| Tier           | Examples                                    | Change cost |
+| -------------- | ------------------------------------------- | ----------- |
+| Trunk          | tenancy, IAM, event bus                     | very high   |
+| Engine         | workspace engine, audit sink, notifications | high        |
+| Modules        | warehouse, production, …                    | independent |
+| Module SDK     | the plugin contract                         | high        |
+| Infrastructure | storage, queue, gateway                     | moderate    |
 
 ## What is intentionally absent
 

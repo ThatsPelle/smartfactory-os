@@ -62,11 +62,7 @@ export class OutboxPublisher {
   readonly #bus: EventBus;
   readonly #config: PublisherConfig;
 
-  constructor(
-    db: SfosDb,
-    bus: EventBus,
-    config: PublisherConfig = DEFAULT_PUBLISHER_CONFIG
-  ) {
+  constructor(db: SfosDb, bus: EventBus, config: PublisherConfig = DEFAULT_PUBLISHER_CONFIG) {
     this.#db = db;
     this.#bus = bus;
     this.#config = config;

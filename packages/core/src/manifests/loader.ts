@@ -67,9 +67,7 @@ export const loadModules = (
       issues.push({
         moduleId: id,
         kind: 'schema_invalid',
-        detail: parsed.error.issues
-          .map((i) => `${i.path.join('.')}: ${i.message}`)
-          .join('; ')
+        detail: parsed.error.issues.map((i) => `${i.path.join('.')}: ${i.message}`).join('; ')
       });
       continue;
     }

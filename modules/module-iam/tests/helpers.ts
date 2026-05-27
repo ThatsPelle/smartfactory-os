@@ -9,17 +9,23 @@ export const TEST_COMPANY_ID = '00000000-0000-4000-a000-000000000001';
 export const makeRecordingEvents = () => {
   const emitted: EventEnvelope[] = [];
   return {
-    events: { emit: async (env: EventEnvelope) => { emitted.push(env); } },
+    events: {
+      emit: async (env: EventEnvelope) => {
+        emitted.push(env);
+      }
+    },
     emitted
   };
 };
 
 const makeLogger = (): IamServiceCtx['logger'] => ({
   debug: () => {},
-  info:  () => {},
-  warn:  () => {},
+  info: () => {},
+  warn: () => {},
   error: () => {},
-  child: function() { return makeLogger(); }
+  child: function () {
+    return makeLogger();
+  }
 });
 
 export const makeIamCtx = (
@@ -44,11 +50,11 @@ export const seedUser = async (
   email: string,
   password: string
 ): Promise<{ userId: string }> => {
-  const rows = await db.execute(
+  const rows = (await db.execute(
     sql`INSERT INTO core.users (email) VALUES (${email})
         ON CONFLICT (lower(email)) DO UPDATE SET email = EXCLUDED.email
         RETURNING id`
-  ) as Array<{ id: string }>;
+  )) as Array<{ id: string }>;
   const userId = rows[0]!.id;
   const passwordHash = await hashPassword(password);
   await db.execute(

@@ -4,36 +4,36 @@ Every directory has an owning domain. This document is the source of truth.
 
 ## Top-level
 
-| Path | Owning domain | Stability |
-|---|---|---|
-| `apps/web/` | Platform | High |
-| `apps/bff/` | Platform | High |
-| `apps/realtime-gateway/` | Platform (coupled to bff in V1) | Moderate |
-| `apps/worker/` | Platform (Phase 2) | Moderate |
-| `apps/docs/` | Platform | Low |
-| `packages/contracts/` | Platform — trunk | Very high |
-| `packages/module-sdk/` | Platform — public contract | Very high |
-| `packages/core/` | Platform | Very high |
-| `packages/eslint-config/` | Platform | Moderate |
-| `packages/tsconfig/` | Platform | Moderate |
-| `packages/ui/` | Platform | Moderate |
-| `packages/i18n/` | Platform | Moderate |
-| `packages/db/` | Platform | High |
-| `packages/events/` | Platform | High |
-| `modules/module-iam/` | Identity & Access | Independent |
-| `modules/module-workspace/` | Workspace Engine | Independent |
-| `modules/module-warehouse/` | Warehouse | Independent |
-| `modules/module-*` (future) | Per module | Independent |
-| `infra/docker/` | Platform / DevOps | Moderate |
-| `infra/migrations/` | Platform | High |
-| `tools/generators/` | Platform — DX | Moderate |
-| `tools/manifest-validator/` | Platform — CI gate | High |
-| `tools/event-catalog/` | Platform — CI gate | High |
-| `tools/rls-checker/` | Platform — CI gate | High |
-| `docs/architecture/` | Platform — canon | High |
-| `docs/adr/` | Platform — canon | Append-only |
-| `docs/modules/<name>/` | The module's owner | Living |
-| `locales/<lang>/` | Community + Platform | Living |
+| Path                        | Owning domain                   | Stability   |
+| --------------------------- | ------------------------------- | ----------- |
+| `apps/web/`                 | Platform                        | High        |
+| `apps/bff/`                 | Platform                        | High        |
+| `apps/realtime-gateway/`    | Platform (coupled to bff in V1) | Moderate    |
+| `apps/worker/`              | Platform (Phase 2)              | Moderate    |
+| `apps/docs/`                | Platform                        | Low         |
+| `packages/contracts/`       | Platform — trunk                | Very high   |
+| `packages/module-sdk/`      | Platform — public contract      | Very high   |
+| `packages/core/`            | Platform                        | Very high   |
+| `packages/eslint-config/`   | Platform                        | Moderate    |
+| `packages/tsconfig/`        | Platform                        | Moderate    |
+| `packages/ui/`              | Platform                        | Moderate    |
+| `packages/i18n/`            | Platform                        | Moderate    |
+| `packages/db/`              | Platform                        | High        |
+| `packages/events/`          | Platform                        | High        |
+| `modules/module-iam/`       | Identity & Access               | Independent |
+| `modules/module-workspace/` | Workspace Engine                | Independent |
+| `modules/module-warehouse/` | Warehouse                       | Independent |
+| `modules/module-*` (future) | Per module                      | Independent |
+| `infra/docker/`             | Platform / DevOps               | Moderate    |
+| `infra/migrations/`         | Platform                        | High        |
+| `tools/generators/`         | Platform — DX                   | Moderate    |
+| `tools/manifest-validator/` | Platform — CI gate              | High        |
+| `tools/event-catalog/`      | Platform — CI gate              | High        |
+| `tools/rls-checker/`        | Platform — CI gate              | High        |
+| `docs/architecture/`        | Platform — canon                | High        |
+| `docs/adr/`                 | Platform — canon                | Append-only |
+| `docs/modules/<name>/`      | The module's owner              | Living      |
+| `locales/<lang>/`           | Community + Platform            | Living      |
 
 ## Ownership rules
 

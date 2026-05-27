@@ -14,11 +14,7 @@
  *     non-platform packages.
  */
 
-export {
-  createTenantClient,
-  type SfosClient,
-  type SfosDb
-} from './client.js';
+export { createTenantClient, type SfosClient, type SfosDb } from './client.js';
 
 export {
   withTenantContext,

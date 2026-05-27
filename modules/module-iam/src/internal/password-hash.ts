@@ -10,8 +10,7 @@ const OPTIONS = {
   parallelism: 4
 } as const;
 
-export const hashPassword = (plaintext: string): Promise<string> =>
-  hash(plaintext, OPTIONS);
+export const hashPassword = (plaintext: string): Promise<string> => hash(plaintext, OPTIONS);
 
 // verify re-reads algorithm, memoryCost, timeCost, and parallelism from the stored
 // PHC string — passing OPTIONS would be a no-op and could mask hash format changes.

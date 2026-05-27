@@ -69,7 +69,7 @@ execution.
 When you add a new tenant-scoped table:
 
 ```ts
-it('rejects: enumerating the other tenant\'s <thing>', async () => {
+it("rejects: enumerating the other tenant's <thing>", async () => {
   // 1. Admin seeds a row for company B.
   // 2. Tenant client binds to company A.
   // 3. Tenant queries the table.

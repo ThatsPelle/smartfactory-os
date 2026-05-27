@@ -11,6 +11,7 @@
 SmartFactory OS is an open-source platform for factories, workshops, warehouses, and logistics operations. It is built as a **modular monolith first** with sharp boundaries that allow service extraction later without rewriting domain logic. It runs in the cloud, on a self-hosted server, or on a single workstation.
 
 The product philosophy in three lines:
+
 - Adaptive over prescriptive — the platform reshapes itself around the company.
 - Operational, not administrative — built for the shop floor, not just the back office.
 - Dense, not decorative — every pixel earns its place.
@@ -22,6 +23,7 @@ The product philosophy in three lines:
 Industrial software is often rigid, expensive, closed, and outdated. ERP systems are monolithic and assume a fixed process. Warehouse tools are islands. Factory MES software is vendor-locked and treats developer access as a risk.
 
 SmartFactory OS aims for:
+
 - **Modularity** — operational domains are independent and composable.
 - **Operational density** — everything the floor needs, nothing it doesn't.
 - **Self-hosting** — runs on a single machine or a cluster, without cloud lock-in.
@@ -43,18 +45,18 @@ SmartFactory OS aims for:
 
 ## Current foundation
 
-| Area | Status |
-|---|---|
-| pnpm + Turborepo monorepo | ✅ Stable |
-| ESLint v9 Flat Config | ✅ Stable |
-| `dependency-cruiser` architecture enforcement | ✅ Active |
-| `@sfos/tsconfig` | ✅ Stable |
-| `@sfos/eslint-config` | ✅ Stable |
-| `@sfos/contracts` — branded types, Result<T,E>, manifest schema, event envelope | ✅ Stable |
-| `@sfos/events` — event builder, ULID ids, naming helpers | ✅ Stable |
-| `@sfos/module-sdk` — ModuleLifecycle, defineManifest, context interfaces | ✅ Stable |
-| `@sfos/db` — PostgreSQL/RLS/audit/outbox foundation, withTenantContext | ✅ Stable |
-| `@sfos/core` — runtime bootstrap, event bus, lifecycle engine, module registry | ✅ Stable |
+| Area                                                                                    | Status      |
+| --------------------------------------------------------------------------------------- | ----------- |
+| pnpm + Turborepo monorepo                                                               | ✅ Stable   |
+| ESLint v9 Flat Config                                                                   | ✅ Stable   |
+| `dependency-cruiser` architecture enforcement                                           | ✅ Active   |
+| `@sfos/tsconfig`                                                                        | ✅ Stable   |
+| `@sfos/eslint-config`                                                                   | ✅ Stable   |
+| `@sfos/contracts` — branded types, Result<T,E>, manifest schema, event envelope         | ✅ Stable   |
+| `@sfos/events` — event builder, ULID ids, naming helpers                                | ✅ Stable   |
+| `@sfos/module-sdk` — ModuleLifecycle, defineManifest, context interfaces                | ✅ Stable   |
+| `@sfos/db` — PostgreSQL/RLS/audit/outbox foundation, withTenantContext                  | ✅ Stable   |
+| `@sfos/core` — runtime bootstrap, event bus, lifecycle engine, module registry          | ✅ Stable   |
 | `module-iam` — auth, sessions, invitations, password reset, manifest, adversarial tests | ✅ Complete |
 
 ---
@@ -66,6 +68,7 @@ Before reading code, read the architecture index: [`docs/architecture/README.md`
 For a one-page overview: [`ARCHITECTURE.md`](ARCHITECTURE.md).
 
 Supporting docs:
+
 - [`AGENTS.md`](AGENTS.md) — guidance for AI assistants working in this repository
 - [`OWNERSHIP.md`](OWNERSHIP.md) — which directories belong to which domains
 - [`CONTRIBUTING.md`](CONTRIBUTING.md) — contribution process
@@ -86,6 +89,7 @@ locales/      Translation files (en, it)
 ```
 
 **Boundary rules (enforced by dependency-cruiser and ESLint, CI fails on violation):**
+
 - Apps import from packages and modules.
 - Modules import from `@sfos/module-sdk`, `@sfos/contracts`, `@sfos/db`, `@sfos/events` — never from `@sfos/core` and never from other modules.
 - Packages never import from apps or modules.
@@ -132,8 +136,8 @@ Integration tests skip cleanly with `describe.skipIf(!TEST_DATABASE_URL)` — th
 
 ## Roadmap
 
-1. **Foundation stabilization** — monorepo, core runtime, module SDK *(done)*
-2. **IAM module** — authentication, sessions, invitations, password reset *(done)*
+1. **Foundation stabilization** — monorepo, core runtime, module SDK _(done)_
+2. **IAM module** — authentication, sessions, invitations, password reset _(done)_
 3. **Workspace engine** — tenant workspace orchestration, module activation
 4. **First vertical slice** — auth + workspace + one operational module end-to-end
 5. **Warehouse module** — inventory, movements, stock events

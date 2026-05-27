@@ -10,8 +10,13 @@ const DB_URL = process.env['TEST_DATABASE_URL'];
 describe.skipIf(!DB_URL)('password reset — integration', () => {
   let iamClient: ReturnType<typeof createIamDb>;
 
-  beforeAll(async () => { iamClient = createIamDb(DB_URL!); });
-  afterAll(async () => { await cleanup(iamClient.db); await iamClient.close(); });
+  beforeAll(async () => {
+    iamClient = createIamDb(DB_URL!);
+  });
+  afterAll(async () => {
+    await cleanup(iamClient.db);
+    await iamClient.close();
+  });
 
   it('requestPasswordReset returns Ok(null) for unknown email (no user enumeration)', async () => {
     const { ctx } = makeIamCtx(iamClient.db);
@@ -37,7 +42,10 @@ describe.skipIf(!DB_URL)('password reset — integration', () => {
     expect(consumeResult.ok).toBe(true);
     expect(emitted.some((e) => e.type === IAM_EVENTS.CREDENTIAL_PASSWORD_CHANGED)).toBe(true);
 
-    const loginResult = await login(ctx, { email: 'resetme@test.example', password: 'NewPassword456!' });
+    const loginResult = await login(ctx, {
+      email: 'resetme@test.example',
+      password: 'NewPassword456!'
+    });
     expect(loginResult.ok).toBe(true);
   });
 
@@ -50,7 +58,10 @@ describe.skipIf(!DB_URL)('password reset — integration', () => {
     expect(reqResult.ok).toBe(true);
     if (!reqResult.ok || !reqResult.value) return;
 
-    await consumePasswordReset(ctx, { token: reqResult.value.token, newPassword: 'NewPass123456!' });
+    await consumePasswordReset(ctx, {
+      token: reqResult.value.token,
+      newPassword: 'NewPass123456!'
+    });
 
     const second = await consumePasswordReset(ctx, {
       token: reqResult.value.token,

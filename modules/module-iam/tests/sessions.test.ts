@@ -75,10 +75,15 @@ describe.skipIf(!DB_URL)('auth service — integration', () => {
   it('validateSession returns output for a valid token', async () => {
     await seedUser(iamClient.db, 'carol@test.example', 'SecurePass123!');
     const { ctx } = makeIamCtx(iamClient.db);
-    const loginResult = await login(ctx, { email: 'carol@test.example', password: 'SecurePass123!' });
+    const loginResult = await login(ctx, {
+      email: 'carol@test.example',
+      password: 'SecurePass123!'
+    });
     expect(loginResult.ok).toBe(true);
     if (!loginResult.ok) return;
-    const validateResult = await validateSession(ctx, { accessToken: loginResult.value.accessToken });
+    const validateResult = await validateSession(ctx, {
+      accessToken: loginResult.value.accessToken
+    });
     expect(validateResult.ok).toBe(true);
     if (!validateResult.ok) return;
     expect(validateResult.value.userId).toBe(loginResult.value.userId);
@@ -86,13 +91,20 @@ describe.skipIf(!DB_URL)('auth service — integration', () => {
 
   it('validateSession returns session_revoked for a revoked session', async () => {
     const { userId } = await seedUser(iamClient.db, 'dave@test.example', 'SecurePass123!');
-    const { ctx } = makeIamCtx(iamClient.db, { actorUserId: userId as IamServiceCtx['actorUserId'] });
-    const loginResult = await login(ctx, { email: 'dave@test.example', password: 'SecurePass123!' });
+    const { ctx } = makeIamCtx(iamClient.db, {
+      actorUserId: userId as IamServiceCtx['actorUserId']
+    });
+    const loginResult = await login(ctx, {
+      email: 'dave@test.example',
+      password: 'SecurePass123!'
+    });
     expect(loginResult.ok).toBe(true);
     if (!loginResult.ok) return;
 
     await logout(ctx as IamServiceCtx, { sessionId: loginResult.value.sessionId });
-    const validateResult = await validateSession(ctx, { accessToken: loginResult.value.accessToken });
+    const validateResult = await validateSession(ctx, {
+      accessToken: loginResult.value.accessToken
+    });
     expect(validateResult.ok).toBe(false);
     if (validateResult.ok) return;
     expect(validateResult.error.code).toBe('session_revoked');

@@ -35,6 +35,7 @@ const envelope = buildEnvelope({
 ```
 
 `buildEnvelope` enforces:
+
 - The event type belongs to `source_module`.
 - The envelope is structurally valid per the Zod schema.
 

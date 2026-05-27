@@ -43,7 +43,9 @@ export const auditLogs = coreSchema.table(
     changes: jsonb('changes'),
 
     /** Free-form context the actor wants preserved (request id, IP, etc.). */
-    metadata: jsonb('metadata').notNull().default(sql`'{}'::jsonb`),
+    metadata: jsonb('metadata')
+      .notNull()
+      .default(sql`'{}'::jsonb`),
 
     /** Linkage to the originating envelope. ULID per @sfos/contracts. */
     correlationId: text('correlation_id'),

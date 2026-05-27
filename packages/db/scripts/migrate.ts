@@ -24,9 +24,7 @@ const migrationsDir = path.resolve(here, '..', 'drizzle');
 
 const adminUrl = process.env['DATABASE_ADMIN_URL'];
 if (!adminUrl) {
-  throw new Error(
-    'DATABASE_ADMIN_URL is not set. Copy packages/db/.env.example to .env first.'
-  );
+  throw new Error('DATABASE_ADMIN_URL is not set. Copy packages/db/.env.example to .env first.');
 }
 
 const sql = postgres(adminUrl, { max: 1, onnotice: () => undefined });

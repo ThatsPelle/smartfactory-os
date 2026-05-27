@@ -46,9 +46,7 @@ export const manifest = defineManifest({
   schema: { namespace: 'crm', owns_tables: ['contacts'], published_views: [] },
   migrations: { directory: 'db/migrations', ordering: 'sequential' },
   permissions: [],
-  events_produced: [
-    { type: 'crm.contact.created', version: '1.0' /* + payload_schema */ }
-  ],
+  events_produced: [{ type: 'crm.contact.created', version: '1.0' /* + payload_schema */ }],
   events_consumed: [],
   metadata: { description: 'Customer relationship management' }
 });
@@ -166,10 +164,20 @@ import { lifecycle } from './lifecycle.js';
 
 const calls: string[] = [];
 const ctx = {
-  logger: { info: () => {}, warn: () => {}, error: () => {}, debug: () => {}, child: () => ctx.logger },
+  logger: {
+    info: () => {},
+    warn: () => {},
+    error: () => {},
+    debug: () => {},
+    child: () => ctx.logger
+  },
   moduleId: 'crm',
   settings: { get: () => undefined, has: () => true },
-  events: { subscribe: (p, h) => { calls.push(p); } }
+  events: {
+    subscribe: (p, h) => {
+      calls.push(p);
+    }
+  }
 };
 
 await lifecycle.preFlight!(ctx as any);

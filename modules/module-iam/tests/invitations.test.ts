@@ -1,6 +1,10 @@
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 import { createIamDb } from '../src/server/db/client.js';
-import { createInvitation, acceptInvitation, revokeInvitation } from '../src/server/api/invitations.js';
+import {
+  createInvitation,
+  acceptInvitation,
+  revokeInvitation
+} from '../src/server/api/invitations.js';
 import { makeIamCtx, seedUser, cleanup } from './helpers.js';
 import type { IamServiceCtx } from '../src/server/context.js';
 
@@ -41,7 +45,11 @@ describe.skipIf(!DB_URL)('invitations service — integration', () => {
     expect(created.ok).toBe(true);
     if (!created.ok) return;
 
-    const { userId: acceptorId } = await seedUser(iamClient.db, 'acceptor@test.example', 'Pass123!');
+    const { userId: acceptorId } = await seedUser(
+      iamClient.db,
+      'acceptor@test.example',
+      'Pass123!'
+    );
 
     const first = await acceptInvitation(ctx, {
       token: created.value.token,

@@ -1,7 +1,10 @@
 import { z } from 'zod';
 
 export const PasswordResetRequestInputSchema = z.object({
-  email: z.string().email().transform((e) => e.toLowerCase())
+  email: z
+    .string()
+    .email()
+    .transform((e) => e.toLowerCase())
 });
 export type PasswordResetRequestInput = z.infer<typeof PasswordResetRequestInputSchema>;
 

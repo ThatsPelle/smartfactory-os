@@ -40,10 +40,7 @@ const indexProviders = (
 ): Map<string, readonly RegisteredModule[]> => {
   const byKey = new Map<string, RegisteredModule[]>();
   for (const m of modules) {
-    const all = [
-      ...m.manifest.capabilities.provides,
-      ...m.manifest.capabilities.provides_optional
-    ];
+    const all = [...m.manifest.capabilities.provides, ...m.manifest.capabilities.provides_optional];
     for (const cap of all) {
       // Sanity-check the cap key format up front so a malformed manifest
       // surfaces here, not deep in resolution.
@@ -148,9 +145,7 @@ const topoSort = (
   return order;
 };
 
-export const resolveCapabilities = (
-  modules: readonly RegisteredModule[]
-): CapabilityResolution => {
+export const resolveCapabilities = (modules: readonly RegisteredModule[]): CapabilityResolution => {
   const providersByKey = indexProviders(modules);
   const providersByModule = new Map<string, string[]>();
   const unresolvedByModule = new Map<string, CapabilityRequirement[]>();
@@ -194,7 +189,9 @@ export const resolveCapabilities = (
             const edgeList = edges.get(id);
             const provList = providersByModule.get(id);
             if (edgeList === undefined || provList === undefined) {
-              throw new Error(`resolveCapabilities invariant violated: missing bookkeeping for "${id}"`);
+              throw new Error(
+                `resolveCapabilities invariant violated: missing bookkeeping for "${id}"`
+              );
             }
             edgeList.push(providerId);
             provList.push(providerId);
@@ -209,9 +206,7 @@ export const resolveCapabilities = (
 
   return {
     order,
-    providersByModule: new Map(
-      [...providersByModule].map(([k, v]) => [k, v as readonly string[]])
-    ),
+    providersByModule: new Map([...providersByModule].map(([k, v]) => [k, v as readonly string[]])),
     unresolvedByModule: new Map(
       [...unresolvedByModule].map(([k, v]) => [k, v as readonly CapabilityRequirement[]])
     ),

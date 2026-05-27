@@ -7,6 +7,7 @@
 Report privately to: `security@smartfactory-os.dev` (or, until that address is live, by opening a private security advisory on GitHub).
 
 Include:
+
 - A description of the vulnerability.
 - Steps to reproduce.
 - Affected versions / deployment modes.
@@ -22,12 +23,14 @@ Include:
 ## Scope
 
 In scope:
+
 - The platform core (`packages/core`, `packages/contracts`, `packages/module-sdk`).
 - All built-in modules under `modules/`.
 - All apps under `apps/`.
 - Default Docker compose / deployment templates under `infra/`.
 
 Out of scope:
+
 - Third-party / community modules (report to their maintainers).
 - Self-host configurations that diverge from documented defaults.
 - Social-engineering attacks not exploiting a platform vulnerability.

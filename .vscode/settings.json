@@ -7,7 +7,11 @@
   "typescript.tsdk": "node_modules/typescript/lib",
   "typescript.enablePromptUseWorkspaceTsdk": true,
   "eslint.useFlatConfig": true,
-  "eslint.workingDirectories": [{ "pattern": "apps/*" }, { "pattern": "packages/*" }, { "pattern": "modules/*" }],
+  "eslint.workingDirectories": [
+    { "pattern": "apps/*" },
+    { "pattern": "packages/*" },
+    { "pattern": "modules/*" }
+  ],
   "eslint.validate": ["javascript", "typescript", "typescriptreact"],
   "files.exclude": {
     "**/.turbo": true,

@@ -27,8 +27,14 @@ describe.skipIf(!DB_URL)('adversarial security tests', () => {
     await seedUser(iamClient.db, 'known@test.example', 'SecurePass123!');
     const { ctx } = makeIamCtx(iamClient.db);
 
-    const unknownEmailResult = await login(ctx, { email: 'nobody@test.example', password: 'whatever' });
-    const wrongPasswordResult = await login(ctx, { email: 'known@test.example', password: 'WrongPass!' });
+    const unknownEmailResult = await login(ctx, {
+      email: 'nobody@test.example',
+      password: 'whatever'
+    });
+    const wrongPasswordResult = await login(ctx, {
+      email: 'known@test.example',
+      password: 'WrongPass!'
+    });
 
     expect(unknownEmailResult.ok).toBe(false);
     expect(wrongPasswordResult.ok).toBe(false);
@@ -62,7 +68,10 @@ describe.skipIf(!DB_URL)('adversarial security tests', () => {
     const { userId } = await seedUser(iamClient.db, 'revoketest@test.example', 'Pass123!');
     const { ctx } = makeIamCtx(iamClient.db, { actorUserId: userId as unknown as UserId });
 
-    const loginResult = await login(ctx, { email: 'revoketest@test.example', password: 'Pass123!' });
+    const loginResult = await login(ctx, {
+      email: 'revoketest@test.example',
+      password: 'Pass123!'
+    });
     expect(loginResult.ok).toBe(true);
     if (!loginResult.ok) return;
 
@@ -80,7 +89,11 @@ describe.skipIf(!DB_URL)('adversarial security tests', () => {
   });
 
   it('INVITE-1: concurrent accept of same invitation — exactly one wins', async () => {
-    const { userId: adminId } = await seedUser(iamClient.db, 'invite-admin@test.example', 'Pass123!');
+    const { userId: adminId } = await seedUser(
+      iamClient.db,
+      'invite-admin@test.example',
+      'Pass123!'
+    );
     const { userId: user1Id } = await seedUser(iamClient.db, 'acceptor1@test.example', 'Pass123!');
     const { userId: user2Id } = await seedUser(iamClient.db, 'acceptor2@test.example', 'Pass123!');
     await seedMembership(iamClient.db, adminId);
@@ -88,7 +101,10 @@ describe.skipIf(!DB_URL)('adversarial security tests', () => {
     const { ctx } = makeIamCtx(iamClient.db, { actorUserId: adminId as unknown as UserId });
 
     // Create invitation for a shared email address
-    const invResult = await createInvitation(ctx, { email: 'shared-acceptee@test.example', role: 'member' });
+    const invResult = await createInvitation(ctx, {
+      email: 'shared-acceptee@test.example',
+      role: 'member'
+    });
     expect(invResult.ok).toBe(true);
     if (!invResult.ok) return;
 
@@ -105,8 +121,8 @@ describe.skipIf(!DB_URL)('adversarial security tests', () => {
     const v1 = r1.status === 'fulfilled' ? r1.value : null;
     const v2 = r2.status === 'fulfilled' ? r2.value : null;
 
-    const successes = [v1, v2].filter(r => r?.ok === true);
-    const failures  = [v1, v2].filter(r => r?.ok === false);
+    const successes = [v1, v2].filter((r) => r?.ok === true);
+    const failures = [v1, v2].filter((r) => r?.ok === false);
 
     // Exactly one wins
     expect(successes).toHaveLength(1);
@@ -128,11 +144,17 @@ describe.skipIf(!DB_URL)('adversarial security tests', () => {
     if (!reqResult.ok || !reqResult.value) return;
 
     // First consume: succeeds
-    const first = await consumePasswordReset(ctx, { token: reqResult.value.token, newPassword: 'NewPass456!' });
+    const first = await consumePasswordReset(ctx, {
+      token: reqResult.value.token,
+      newPassword: 'NewPass456!'
+    });
     expect(first.ok).toBe(true);
 
     // Second consume: must be rejected
-    const second = await consumePasswordReset(ctx, { token: reqResult.value.token, newPassword: 'AnotherPass789!' });
+    const second = await consumePasswordReset(ctx, {
+      token: reqResult.value.token,
+      newPassword: 'AnotherPass789!'
+    });
     expect(second.ok).toBe(false);
     if (second.ok) return;
     expect(second.error.code).toBe('reset_token_consumed');

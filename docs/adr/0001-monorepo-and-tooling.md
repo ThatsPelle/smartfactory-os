@@ -59,14 +59,14 @@ We need a repository topology and toolchain that delivers these from commit 1, b
 
 ## Alternatives considered
 
-| Option | Why not |
-|---|---|
-| **Polyrepo** (one repo per module) | Atomic SDK changes become a multi-PR dance across N repos. Boundary enforcement weaker; community modules become disconnected. |
-| **npm workspaces** | Phantom dependencies in hoisting; less strict than pnpm; slower install. |
-| **yarn (classic) workspaces** | Project unmaintained for our needs; Berry adds more friction than it removes. |
-| **Nx** | More powerful than Turborepo but heavier; generators and plugin ecosystem add cognitive load disproportionate to benefit at this scale. Revisit if the project grows past ~50 packages. |
-| **Bazel / Buck** | Excellent for hundreds of engineers; punishing for a solo developer; weak TypeScript ergonomics. |
-| **No dependency-cruiser** (rely on lint only) | ESLint can't see cross-package paths cleanly; we need a graph-aware tool. |
+| Option                                        | Why not                                                                                                                                                                                 |
+| --------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Polyrepo** (one repo per module)            | Atomic SDK changes become a multi-PR dance across N repos. Boundary enforcement weaker; community modules become disconnected.                                                          |
+| **npm workspaces**                            | Phantom dependencies in hoisting; less strict than pnpm; slower install.                                                                                                                |
+| **yarn (classic) workspaces**                 | Project unmaintained for our needs; Berry adds more friction than it removes.                                                                                                           |
+| **Nx**                                        | More powerful than Turborepo but heavier; generators and plugin ecosystem add cognitive load disproportionate to benefit at this scale. Revisit if the project grows past ~50 packages. |
+| **Bazel / Buck**                              | Excellent for hundreds of engineers; punishing for a solo developer; weak TypeScript ergonomics.                                                                                        |
+| **No dependency-cruiser** (rely on lint only) | ESLint can't see cross-package paths cleanly; we need a graph-aware tool.                                                                                                               |
 
 ## References
 

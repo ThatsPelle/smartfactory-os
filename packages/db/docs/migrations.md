@@ -46,7 +46,7 @@ Once a migration is on `main`, it is frozen. If it is wrong:
 ## Rollback
 
 The platform does not support automatic rollback. For destructive changes
-(drop, rename, type change) use the *expand-and-contract* pattern:
+(drop, rename, type change) use the _expand-and-contract_ pattern:
 
 1. Add the new shape alongside the old (writers populate both).
 2. Backfill.

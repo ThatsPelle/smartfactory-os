@@ -31,22 +31,14 @@ See [`docs/local-setup.md`](./docs/local-setup.md) for the long version.
 ## Public surface
 
 ```ts
-import {
-  createTenantClient,
-  withTenantContext,
-  schema
-} from '@sfos/db';
+import { createTenantClient, withTenantContext, schema } from '@sfos/db';
 
 const client = createTenantClient(process.env.DATABASE_URL!);
 
-await withTenantContext(
-  client.db,
-  { companyId, userId },
-  async (tx) => {
-    // Every query inside this callback is RLS-bound to `companyId`.
-    return tx.select().from(schema.memberships);
-  }
-);
+await withTenantContext(client.db, { companyId, userId }, async (tx) => {
+  // Every query inside this callback is RLS-bound to `companyId`.
+  return tx.select().from(schema.memberships);
+});
 ```
 
 There is intentionally no `createAdminClient` re-exported from the package

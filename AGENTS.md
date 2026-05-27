@@ -4,7 +4,8 @@ This file is a brief for AI coding agents (Claude, GPT, Codex, etc.). Read this 
 
 ## Read the architecture first
 
-The architecture is *not* in the code. It is in `docs/architecture/` as eight documents. Read at least:
+The architecture is _not_ in the code. It is in `docs/architecture/` as eight documents. Read at least:
+
 - `01-blueprint.md` — overall posture
 - `03-bounded-contexts.md` — domain ownership rules (most important for any data change)
 - `04-manifest-and-events.md` — module contract format
@@ -28,16 +29,16 @@ Owning rule: **modules never import other modules**. Cross-module access goes th
 
 ## Where to put new code
 
-| Adding... | Goes in... | Read first |
-|---|---|---|
-| A new type used across modules | `packages/contracts/src/` | 04-manifest-and-events.md §7 |
-| A new helper used in modules | `packages/utils/src/` or a more specific package | 06-monorepo.md §5 |
-| A new operational entity | `modules/module-<name>/src/server/db/` | 03-bounded-contexts.md §7 |
-| A new event | Producing module's `events.ts` + manifest's `events_produced` | 04-manifest-and-events.md §6-7 |
-| A new permission | Producing module's `permissions.ts` + manifest's `permissions` | 05-security-iam-rls.md §4 |
-| A new widget | Module's `src/ui/widgets/` + manifest's `widgets` | 03-bounded-contexts.md §6 |
-| A new module | `pnpm new:module <name>` (uses the template) | 06-monorepo.md §6 |
-| A new ADR | `docs/adr/NNNN-title.md` | `docs/adr/README.md` |
+| Adding...                      | Goes in...                                                     | Read first                     |
+| ------------------------------ | -------------------------------------------------------------- | ------------------------------ |
+| A new type used across modules | `packages/contracts/src/`                                      | 04-manifest-and-events.md §7   |
+| A new helper used in modules   | `packages/utils/src/` or a more specific package               | 06-monorepo.md §5              |
+| A new operational entity       | `modules/module-<name>/src/server/db/`                         | 03-bounded-contexts.md §7      |
+| A new event                    | Producing module's `events.ts` + manifest's `events_produced`  | 04-manifest-and-events.md §6-7 |
+| A new permission               | Producing module's `permissions.ts` + manifest's `permissions` | 05-security-iam-rls.md §4      |
+| A new widget                   | Module's `src/ui/widgets/` + manifest's `widgets`              | 03-bounded-contexts.md §6      |
+| A new module                   | `pnpm new:module <name>` (uses the template)                   | 06-monorepo.md §6              |
+| A new ADR                      | `docs/adr/NNNN-title.md`                                       | `docs/adr/README.md`           |
 
 ## Conventions
 

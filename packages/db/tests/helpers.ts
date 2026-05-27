@@ -87,9 +87,7 @@ export const seedTwoTenants = async (admin: Sql): Promise<SeedResult> => {
 };
 
 /** Convenience: build both clients for a test suite. */
-export const buildClients = (
-  adminUrl: string
-): { admin: SfosClient; tenant: SfosClient } => {
+export const buildClients = (adminUrl: string): { admin: SfosClient; tenant: SfosClient } => {
   const admin = createAdminClient(adminUrl, { max: 2 });
   const tenant = createTenantClient(tenantUrlFromAdmin(adminUrl), { max: 2 });
   return { admin, tenant };

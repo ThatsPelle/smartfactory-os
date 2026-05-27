@@ -11,6 +11,7 @@ Thank you for your interest. This project is a modular industrial platform with 
 ## Setup
 
 Prerequisites:
+
 - Node 20.10+
 - pnpm 9+
 - Docker (for Postgres in dev)
@@ -33,6 +34,7 @@ pnpm validate         # full validation
 ## Commit messages
 
 Use conventional commits where reasonable:
+
 - `feat(module-warehouse): add lot tracking`
 - `fix(iam): correct session expiration check`
 - `docs(architecture): clarify event causation rules`

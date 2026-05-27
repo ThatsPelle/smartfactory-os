@@ -16,9 +16,7 @@ export {
   createDefaultLogger
 } from './runtime/index.js';
 
-export {
-  InMemoryModuleRegistry
-} from './registry/index.js';
+export { InMemoryModuleRegistry } from './registry/index.js';
 
 export {
   LifecycleEngine,

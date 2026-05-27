@@ -62,14 +62,14 @@ the opposite default.
 
 Recurring decisions documented so a future change does not relitigate them:
 
-| Concern | Where it lives | Why not here |
-| --- | --- | --- |
-| HTTP transport | the BFF / app | the runtime should be process-agnostic |
-| Auth, session, RLS binding | the BFF | tenant context is a request concern |
-| Realtime / WebSocket | a dedicated module | not foundational, not minimal |
-| Distributed event bus | a future module behind capability `core.event_bus@1` | swappable, not built-in |
-| Job scheduler / cron | a future module | same |
-| Dashboards, automation, AI | modules | not platform |
+| Concern                    | Where it lives                                       | Why not here                           |
+| -------------------------- | ---------------------------------------------------- | -------------------------------------- |
+| HTTP transport             | the BFF / app                                        | the runtime should be process-agnostic |
+| Auth, session, RLS binding | the BFF                                              | tenant context is a request concern    |
+| Realtime / WebSocket       | a dedicated module                                   | not foundational, not minimal          |
+| Distributed event bus      | a future module behind capability `core.event_bus@1` | swappable, not built-in                |
+| Job scheduler / cron       | a future module                                      | same                                   |
+| Dashboards, automation, AI | modules                                              | not platform                           |
 
 The runtime is the **floor** other things sit on. It is not the place
 where every operational concern accumulates.

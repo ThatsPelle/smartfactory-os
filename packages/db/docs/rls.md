@@ -6,7 +6,7 @@ defense in depth, not the primary mechanism.
 ## Five rules
 
 1. **Every tenant-scoped table has RLS enabled and FORCED.** `FORCE ROW LEVEL
-   SECURITY` makes the policies apply to the owning role too, which prevents
+SECURITY` makes the policies apply to the owning role too, which prevents
    a future grant from accidentally creating a hole.
 2. **Missing context fails closed.** `app.current_company_id()` returns
    `NULL` when `app.current_company_id` is unset; every `USING` clause
@@ -35,7 +35,7 @@ pooled connection` proves this every CI run.
 
 ## Why not put RLS in the ORM?
 
-- The ORM is a *client*. A second client (psql, a future Go service, a
+- The ORM is a _client_. A second client (psql, a future Go service, a
   cron job) gets none of those checks.
 - A bug in the ORM's query builder bypasses ORM-level filters silently.
   RLS is opaque to the ORM — it cannot bypass what it cannot see.
@@ -45,10 +45,10 @@ pooled connection` proves this every CI run.
 
 Two Postgres roles:
 
-| Role          | `BYPASSRLS`? | Use                                              |
-| ------------- | -----------: | ------------------------------------------------ |
-| `postgres`    |          yes | migrations, the outbox publisher, the test harness |
-| `app_tenant`  |           no | every application connection that handles tenant data |
+| Role         | `BYPASSRLS`? | Use                                                   |
+| ------------ | -----------: | ----------------------------------------------------- |
+| `postgres`   |          yes | migrations, the outbox publisher, the test harness    |
+| `app_tenant` |           no | every application connection that handles tenant data |
 
 Production rotates the `app_tenant` password out of band. The compose
 file's `app_tenant` password (set in migration `0000`) is for local dev

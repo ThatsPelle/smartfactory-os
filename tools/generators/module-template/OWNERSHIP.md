@@ -1,4 +1,4 @@
-# Ownership — __DISPLAY_NAME__
+# Ownership — **DISPLAY_NAME**
 
 ## Code ownership
 

@@ -1,4 +1,4 @@
-# Module — __DISPLAY_NAME__
+# Module — **DISPLAY_NAME**
 
 > **One-line summary**: replace this with what the module is for.
 
@@ -13,47 +13,47 @@ What does this module own? Why does it exist? Two paragraphs maximum.
 
 The module owns these entities in schema `__SCHEMA_NAME__`:
 
-| Entity | Description | Owner role |
-|---|---|---|
-| (table) | (purpose) | (which role primarily mutates) |
+| Entity  | Description | Owner role                     |
+| ------- | ----------- | ------------------------------ |
+| (table) | (purpose)   | (which role primarily mutates) |
 
 ## Capabilities provided
 
-| Capability | Notes |
-|---|---|
+| Capability                  | Notes                                         |
+| --------------------------- | --------------------------------------------- |
 | `__MODULE_NAME__.example@1` | What it lets other modules / widgets / AI do. |
 
 ## Capabilities required
 
-| Capability | Hard / Soft |
-|---|---|
-| `core.tenancy@1` | hard |
-| `core.event_bus@1` | hard |
+| Capability         | Hard / Soft |
+| ------------------ | ----------- |
+| `core.tenancy@1`   | hard        |
+| `core.event_bus@1` | hard        |
 
 ## Events produced
 
-| Event type | Version | When |
-|---|---|---|
-| `__MODULE_NAME__.entity.action` | `1.0` | When the action happens. |
+| Event type                      | Version | When                     |
+| ------------------------------- | ------- | ------------------------ |
+| `__MODULE_NAME__.entity.action` | `1.0`   | When the action happens. |
 
 ## Events consumed
 
 | Pattern | Handler | Why |
-|---|---|---|
-| — | — | — |
+| ------- | ------- | --- |
+| —       | —       | —   |
 
 ## Permissions
 
-| Key | Default roles | What it allows |
-|---|---|---|
-| `__MODULE_NAME__.entity.read` | admin, supervisor | Reading entity |
-| `__MODULE_NAME__.entity.write` | admin | Mutating entity |
+| Key                            | Default roles     | What it allows  |
+| ------------------------------ | ----------------- | --------------- |
+| `__MODULE_NAME__.entity.read`  | admin, supervisor | Reading entity  |
+| `__MODULE_NAME__.entity.write` | admin             | Mutating entity |
 
 ## Widgets
 
-| Widget id | Kind | Default size |
-|---|---|---|
-| (none yet) | — | — |
+| Widget id  | Kind | Default size |
+| ---------- | ---- | ------------ |
+| (none yet) | —    | —            |
 
 ## Quick start: common modifications
 

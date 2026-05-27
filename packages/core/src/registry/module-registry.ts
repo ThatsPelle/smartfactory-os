@@ -1,9 +1,5 @@
 import type { CapabilityKey } from '@sfos/contracts/manifest';
-import type {
-  CapabilityCheckResult,
-  ModuleRegistry,
-  RegisteredModule
-} from '@sfos/module-sdk';
+import type { CapabilityCheckResult, ModuleRegistry, RegisteredModule } from '@sfos/module-sdk';
 import type { CompanyId } from '@sfos/contracts/brands';
 
 import { ModuleAlreadyRegisteredError } from '../lifecycle/errors.js';
@@ -60,11 +56,7 @@ export class InMemoryModuleRegistry implements ModuleRegistry {
   setOrder(order: readonly string[]): void {
     // Filter to ids actually registered — bootstrap may pass extra ids
     // from a manifest set that didn't all register.
-    this.#order.splice(
-      0,
-      this.#order.length,
-      ...order.filter((id) => this.#byId.has(id))
-    );
+    this.#order.splice(0, this.#order.length, ...order.filter((id) => this.#byId.has(id)));
   }
 
   list(): readonly RegisteredModule[] {

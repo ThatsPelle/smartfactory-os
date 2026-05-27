@@ -42,9 +42,9 @@ Keep ADRs short — 200-600 words typical. Long ADRs usually mean the decision w
 
 ## Index
 
-| # | Title | Status | Date |
-|---|---|---|---|
-| [0001](0001-monorepo-and-tooling.md) | Monorepo, pnpm, Turborepo, dependency-cruiser | accepted | 2026-05-20 |
-| [0002](0002-eslint-v9-flat-config.md) | Adopt ESLint v9 Flat Config | accepted | 2026-05-20 |
+| #                                     | Title                                         | Status   | Date       |
+| ------------------------------------- | --------------------------------------------- | -------- | ---------- |
+| [0001](0001-monorepo-and-tooling.md)  | Monorepo, pnpm, Turborepo, dependency-cruiser | accepted | 2026-05-20 |
+| [0002](0002-eslint-v9-flat-config.md) | Adopt ESLint v9 Flat Config                   | accepted | 2026-05-20 |
 
 (Update this table when adding a new ADR.)

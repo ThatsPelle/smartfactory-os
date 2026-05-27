@@ -67,14 +67,14 @@ engine.transition('crm', 'failed', 'preFlight: missing DATABASE_URL');
 Bootstrap drives the legal transitions for every module. The `reason`
 strings are stable enough to grep across log lines.
 
-| Phase           | Transition driver                                    |
-| --------------- | ---------------------------------------------------- |
-| load            | `engine.introduce(id, 'loaded')` puts in `discovered`|
-| resolve         | `validated`, then `failed` on unresolved/cycle       |
-| register        | `registered` for everyone the registry accepted     |
-| initialize      | `initialized` on hook success; `failed` otherwise   |
-| (runtime)       | `degraded` when a subscribed handler raises          |
-| (operator)      | `disabled` (admin endpoint, not yet wired)           |
+| Phase      | Transition driver                                     |
+| ---------- | ----------------------------------------------------- |
+| load       | `engine.introduce(id, 'loaded')` puts in `discovered` |
+| resolve    | `validated`, then `failed` on unresolved/cycle        |
+| register   | `registered` for everyone the registry accepted       |
+| initialize | `initialized` on hook success; `failed` otherwise     |
+| (runtime)  | `degraded` when a subscribed handler raises           |
+| (operator) | `disabled` (admin endpoint, not yet wired)            |
 
 ## Per-tenant activation is separate
 

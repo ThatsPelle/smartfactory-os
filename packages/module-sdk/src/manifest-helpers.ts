@@ -23,9 +23,7 @@ export const defineManifest = (manifest: Manifest): Manifest => {
     const issues = result.error.issues
       .map((i) => `  - ${i.path.join('.')}: ${i.message}`)
       .join('\n');
-    throw new Error(
-      `Invalid manifest for "${manifest.identity?.id ?? '<unknown>'}":\n${issues}`
-    );
+    throw new Error(`Invalid manifest for "${manifest.identity?.id ?? '<unknown>'}":\n${issues}`);
   }
   return result.data;
 };

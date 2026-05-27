@@ -8,7 +8,7 @@
  * Rules:
  *   - UI never accesses the database directly. All data fetches go through
  *     the module's API client (typed). The React preset's `no-restricted-imports`
- *     blocks `@sfos/db` and `**/server/db/*` from UI files.
+ *     blocks `@sfos/db` and `**/ server / db; /*` from UI files.
  *   - Widgets register themselves via the manifest's `widgets` block (added
  *     when the platform's widget runtime lands).
  */

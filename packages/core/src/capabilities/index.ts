@@ -5,7 +5,4 @@ export {
   type ParsedCapabilityKey
 } from './version.js';
 
-export {
-  resolveCapabilities,
-  type CapabilityResolution
-} from './graph.js';
+export { resolveCapabilities, type CapabilityResolution } from './graph.js';

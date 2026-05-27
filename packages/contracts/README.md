@@ -6,14 +6,14 @@ This package depends on `zod` only. It has zero internal dependencies (enforced 
 
 ## What's here
 
-| Module | Exposes |
-|---|---|
-| `brands.ts` | Branded primitive types (`CompanyId`, `UserId`, `ULID`, ...) + Zod schemas |
-| `result.ts` | `Result<T, E>` + `Ok`/`Err` constructors |
-| `envelope.ts` | The event envelope schema — **frozen at v1** |
-| `manifest.ts` | The module manifest schema — **frozen at v1** |
-| `permissions.ts` | Well-known platform permission keys |
-| `capabilities.ts` | Well-known platform capability keys |
+| Module            | Exposes                                                                    |
+| ----------------- | -------------------------------------------------------------------------- |
+| `brands.ts`       | Branded primitive types (`CompanyId`, `UserId`, `ULID`, ...) + Zod schemas |
+| `result.ts`       | `Result<T, E>` + `Ok`/`Err` constructors                                   |
+| `envelope.ts`     | The event envelope schema — **frozen at v1**                               |
+| `manifest.ts`     | The module manifest schema — **frozen at v1**                              |
+| `permissions.ts`  | Well-known platform permission keys                                        |
+| `capabilities.ts` | Well-known platform capability keys                                        |
 
 ## Usage
 

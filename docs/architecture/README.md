@@ -2,16 +2,16 @@
 
 The platform's architecture is documented in **eight canonical documents**. Read them in order before contributing.
 
-| # | Document | Owns |
-|---|---|---|
-| 01 | `01-blueprint.md` | Product vision, deployment posture, tech stack, system topology |
-| 02 | `02-wizard.md` | Initialization wizard — 6 steps, end-to-end orchestration |
-| 03 | `03-bounded-contexts.md` | Domain ownership, source-of-truth rules, anti-corruption |
-| 04 | `04-manifest-and-events.md` | Manifest schema, event envelope, registry mechanics, capabilities |
-| 05 | `05-security-iam-rls.md` | Multi-tenant security, RLS policy patterns, automation/AI boundaries |
-| 06 | `06-monorepo.md` | Repository structure, import discipline, package strategy |
-| 07 | `07-vertical-slice.md` | First end-to-end implementation — the architecture's acceptance test |
-| 08 | `08-bootstrap.md` | Execution sequencing — how the architecture becomes a working repo |
+| #   | Document                    | Owns                                                                 |
+| --- | --------------------------- | -------------------------------------------------------------------- |
+| 01  | `01-blueprint.md`           | Product vision, deployment posture, tech stack, system topology      |
+| 02  | `02-wizard.md`              | Initialization wizard — 6 steps, end-to-end orchestration            |
+| 03  | `03-bounded-contexts.md`    | Domain ownership, source-of-truth rules, anti-corruption             |
+| 04  | `04-manifest-and-events.md` | Manifest schema, event envelope, registry mechanics, capabilities    |
+| 05  | `05-security-iam-rls.md`    | Multi-tenant security, RLS policy patterns, automation/AI boundaries |
+| 06  | `06-monorepo.md`            | Repository structure, import discipline, package strategy            |
+| 07  | `07-vertical-slice.md`      | First end-to-end implementation — the architecture's acceptance test |
+| 08  | `08-bootstrap.md`           | Execution sequencing — how the architecture becomes a working repo   |
 
 ## Status
 

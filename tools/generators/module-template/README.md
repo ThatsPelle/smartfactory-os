@@ -7,13 +7,13 @@ substituted by the `pnpm new:module` generator (added in a later phase).
 Until the generator lands, copy this directory by hand and replace tokens
 consistently:
 
-| Token | Example | Where it appears |
-|---|---|---|
-| `__MODULE_NAME__` | `warehouse` | filenames, identifiers, paths |
-| `__MODULE_SLUG__` | `module-warehouse` | package name, directory name |
-| `__MODULE_FULL_ID__` | `org.smartfactory-os.warehouse` | manifest identity id |
-| `__SCHEMA_NAME__` | `module_warehouse` | Postgres schema namespace |
-| `__DISPLAY_NAME__` | `Warehouse` | human-readable name |
+| Token                | Example                         | Where it appears              |
+| -------------------- | ------------------------------- | ----------------------------- |
+| `__MODULE_NAME__`    | `warehouse`                     | filenames, identifiers, paths |
+| `__MODULE_SLUG__`    | `module-warehouse`              | package name, directory name  |
+| `__MODULE_FULL_ID__` | `org.smartfactory-os.warehouse` | manifest identity id          |
+| `__SCHEMA_NAME__`    | `module_warehouse`              | Postgres schema namespace     |
+| `__DISPLAY_NAME__`   | `Warehouse`                     | human-readable name           |
 
 ## What the template contains
 

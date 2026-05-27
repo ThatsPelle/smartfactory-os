@@ -6,10 +6,7 @@ export {
   type ModuleState
 } from './state.js';
 
-export {
-  LifecycleEngine,
-  type LifecycleHistoryEntry
-} from './engine.js';
+export { LifecycleEngine, type LifecycleHistoryEntry } from './engine.js';
 
 export {
   IllegalLifecycleTransitionError,

@@ -4,12 +4,12 @@ Shared **ESLint v9 flat-config** presets for SmartFactory OS. The package owns t
 
 ## Presets
 
-| Preset | Use for |
-|---|---|
-| `@sfos/eslint-config/base` | Any package or module (foundation; the others spread it) |
-| `@sfos/eslint-config/node` | Node-targeted libraries (BFF, workers, module server) |
-| `@sfos/eslint-config/react` | React apps + module UI |
-| `@sfos/eslint-config/tests` | Test files (relaxes some rules) |
+| Preset                      | Use for                                                  |
+| --------------------------- | -------------------------------------------------------- |
+| `@sfos/eslint-config/base`  | Any package or module (foundation; the others spread it) |
+| `@sfos/eslint-config/node`  | Node-targeted libraries (BFF, workers, module server)    |
+| `@sfos/eslint-config/react` | React apps + module UI                                   |
+| `@sfos/eslint-config/tests` | Test files (relaxes some rules)                          |
 
 Each preset exports a **flat-config array** as its default export.
 
@@ -22,10 +22,7 @@ In a package's `eslint.config.js`:
 import nodeConfig from '@sfos/eslint-config/node';
 
 /** @type {import('eslint').Linter.Config[]} */
-export default [
-  { ignores: ['dist/**'] },
-  ...nodeConfig
-];
+export default [{ ignores: ['dist/**'] }, ...nodeConfig];
 ```
 
 For a UI package:
@@ -72,11 +69,11 @@ The full inter-package boundary enforcement lives in `.dependency-cruiser.cjs` a
 
 ## Why these dependency choices
 
-| Dep | Why |
-|---|---|
-| `@eslint/js` | Provides `js.configs.recommended` for the core JS rules. |
+| Dep                               | Why                                                                                                                                                      |
+| --------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `@eslint/js`                      | Provides `js.configs.recommended` for the core JS rules.                                                                                                 |
 | `typescript-eslint` (combined v8) | Provides parser + plugin + flat-config presets in one package. Replaces direct deps on `@typescript-eslint/parser` + `@typescript-eslint/eslint-plugin`. |
-| `eslint-plugin-import-x` | Flat-config-native fork of `eslint-plugin-import`. Cleaner integration; same rule names + behavior we use. |
-| `globals` | Provides the Node / browser / ES2022 global sets that previously came from `env` declarations. Standard flat-config pattern. |
+| `eslint-plugin-import-x`          | Flat-config-native fork of `eslint-plugin-import`. Cleaner integration; same rule names + behavior we use.                                               |
+| `globals`                         | Provides the Node / browser / ES2022 global sets that previously came from `env` declarations. Standard flat-config pattern.                             |
 
 See [ADR-0002](../../docs/adr/0002-eslint-v9-flat-config.md) for the full migration rationale.

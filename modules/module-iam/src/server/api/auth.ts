@@ -26,9 +26,9 @@ export const login = async (
   const { systemDb, events, logger, correlationId, companyId } = ctx;
 
   // 1. Lookup user by email — raw SQL because core.users is outside module_iam schema.
-  const userRows = await systemDb.execute(
+  const userRows = (await systemDb.execute(
     sql`SELECT id FROM core.users WHERE lower(email) = ${input.email.toLowerCase()} LIMIT 1`
-  ) as Array<{ id: string }>;
+  )) as Array<{ id: string }>;
 
   // Do not reveal whether the email exists — always return invalid_credentials.
   if (!userRows[0]) {
@@ -61,42 +61,47 @@ export const login = async (
       .set({ failedAttempts: next.failedAttempts, lockedUntil: next.lockedUntil })
       .where(eq(credentials.userId, userId));
 
-    await events.emit(buildIamEnvelope({
-      type: IAM_EVENTS.AUTH_FAILED,
-      version: '1.0',
-      company_id: companyId,
-      emitted_by: systemActor(),
-      correlation_id: correlationId,
-      payload: { userId, reason: 'invalid_password', failedAttempts: next.failedAttempts },
-      audit_required: true
-    }));
-
-    if (isLocked(next)) {
-      await events.emit(buildIamEnvelope({
-        type: IAM_EVENTS.CREDENTIAL_LOCKED,
+    await events.emit(
+      buildIamEnvelope({
+        type: IAM_EVENTS.AUTH_FAILED,
         version: '1.0',
         company_id: companyId,
         emitted_by: systemActor(),
         correlation_id: correlationId,
-        payload: { userId, lockedUntil: next.lockedUntil },
+        payload: { userId, reason: 'invalid_password', failedAttempts: next.failedAttempts },
         audit_required: true
-      }));
+      })
+    );
+
+    if (isLocked(next)) {
+      await events.emit(
+        buildIamEnvelope({
+          type: IAM_EVENTS.CREDENTIAL_LOCKED,
+          version: '1.0',
+          company_id: companyId,
+          emitted_by: systemActor(),
+          correlation_id: correlationId,
+          payload: { userId, lockedUntil: next.lockedUntil },
+          audit_required: true
+        })
+      );
     }
 
     return Err({ code: 'invalid_credentials' });
   }
 
   // 5. Create session atomically with lockout reset.
-  const accessToken      = generateOpaqueToken();
-  const refreshToken     = generateOpaqueToken();
-  const sessionId        = newULID();
-  const now              = new Date();
-  const expiresAt        = new Date(now.getTime() + ACCESS_TOKEN_TTL_MS);
+  const accessToken = generateOpaqueToken();
+  const refreshToken = generateOpaqueToken();
+  const sessionId = newULID();
+  const now = new Date();
+  const expiresAt = new Date(now.getTime() + ACCESS_TOKEN_TTL_MS);
   const refreshExpiresAt = new Date(now.getTime() + REFRESH_TOKEN_TTL_MS);
-  const reset            = resetLockoutState();
+  const reset = resetLockoutState();
 
   await systemDb.transaction(async (tx) => {
-    await tx.update(credentials)
+    await tx
+      .update(credentials)
       .set({ failedAttempts: reset.failedAttempts, lockedUntil: reset.lockedUntil })
       .where(eq(credentials.userId, userId));
 
@@ -104,23 +109,25 @@ export const login = async (
       id: sessionId,
       userId,
       companyId: companyId as string,
-      accessTokenHash:  hashToken(accessToken),
+      accessTokenHash: hashToken(accessToken),
       refreshTokenHash: hashToken(refreshToken),
       expiresAt,
       refreshExpiresAt
     });
   });
 
-  await events.emit(buildIamEnvelope({
-    type: IAM_EVENTS.SESSION_CREATED,
-    version: '1.0',
-    company_id: companyId,
-    emitted_by: userActor(userId),
-    correlation_id: correlationId,
-    source_entity_id: sessionId,
-    payload: { sessionId, userId },
-    audit_required: false
-  }));
+  await events.emit(
+    buildIamEnvelope({
+      type: IAM_EVENTS.SESSION_CREATED,
+      version: '1.0',
+      company_id: companyId,
+      emitted_by: userActor(userId),
+      correlation_id: correlationId,
+      source_entity_id: sessionId,
+      payload: { sessionId, userId },
+      audit_required: false
+    })
+  );
 
   return Ok({
     accessToken,
@@ -142,7 +149,11 @@ export const logout = async (
     where: eq(sessions.id, input.sessionId)
   });
 
-  if (!session || session.companyId !== (companyId as string) || session.userId !== (actorUserId as string | undefined)) {
+  if (
+    !session ||
+    session.companyId !== (companyId as string) ||
+    session.userId !== (actorUserId as string | undefined)
+  ) {
     return Err({ code: 'session_not_found' });
   }
 
@@ -151,20 +162,23 @@ export const logout = async (
     return Err({ code: 'session_revoked' });
   }
 
-  await systemDb.update(sessions)
+  await systemDb
+    .update(sessions)
     .set({ revokedAt: new Date() })
     .where(eq(sessions.id, input.sessionId));
 
-  await events.emit(buildIamEnvelope({
-    type: IAM_EVENTS.SESSION_REVOKED,
-    version: '1.0',
-    company_id: companyId,
-    emitted_by: userActor(actorUserId as string),
-    correlation_id: correlationId,
-    source_entity_id: input.sessionId,
-    payload: { sessionId: input.sessionId, userId: actorUserId },
-    audit_required: true
-  }));
+  await events.emit(
+    buildIamEnvelope({
+      type: IAM_EVENTS.SESSION_REVOKED,
+      version: '1.0',
+      company_id: companyId,
+      emitted_by: userActor(actorUserId as string),
+      correlation_id: correlationId,
+      source_entity_id: input.sessionId,
+      payload: { sessionId: input.sessionId, userId: actorUserId },
+      audit_required: true
+    })
+  );
 
   return OkVoid();
 };

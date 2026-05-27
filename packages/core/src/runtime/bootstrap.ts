@@ -1,5 +1,10 @@
 import { asCompanyId } from '@sfos/contracts';
-import type { RegisteredModule, PlatformContext, ModuleLogger, TenantContext } from '@sfos/module-sdk';
+import type {
+  RegisteredModule,
+  PlatformContext,
+  ModuleLogger,
+  TenantContext
+} from '@sfos/module-sdk';
 
 import { resolveCapabilities } from '../capabilities/graph.js';
 import { EventBus } from '../events/bus.js';
@@ -7,10 +12,7 @@ import { ForeignEmissionError } from '../events/ownership.js';
 import { LifecycleEngine } from '../lifecycle/engine.js';
 import { loadModules, type LoadOptions, type ManifestLoadIssue } from '../manifests/loader.js';
 import { InMemoryModuleRegistry } from '../registry/module-registry.js';
-import type {
-  ModuleDiagnostic,
-  RuntimeDiagnostics
-} from '../diagnostics/state.js';
+import type { ModuleDiagnostic, RuntimeDiagnostics } from '../diagnostics/state.js';
 
 import { createDefaultLogger } from './logger.js';
 
@@ -77,8 +79,10 @@ export const bootstrap = async (input: BootstrapInput): Promise<BootstrapResult>
   const bus = new EventBus();
   const engine = new LifecycleEngine();
   let loadIssues: readonly ManifestLoadIssue[] = [];
-  let unresolvedByModule: ReadonlyMap<string, readonly { capability: string; versionRange: string }[]> =
-    new Map();
+  let unresolvedByModule: ReadonlyMap<
+    string,
+    readonly { capability: string; versionRange: string }[]
+  > = new Map();
   let providersByModule: ReadonlyMap<string, readonly string[]> = new Map();
   let cycles: readonly (readonly string[])[] = [];
 

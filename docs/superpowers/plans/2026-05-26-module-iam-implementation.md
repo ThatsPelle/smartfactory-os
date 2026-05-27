@@ -71,6 +71,7 @@ tests/
 **Goal:** Create the module package with working build, typecheck, lint, and test runner — zero source yet, all tooling green.
 
 **Files:**
+
 - Create: `modules/module-iam/package.json`
 - Create: `modules/module-iam/tsconfig.json`
 - Create: `modules/module-iam/vitest.config.ts`
@@ -78,6 +79,7 @@ tests/
 - Create: `modules/module-iam/src/ui/placeholder.ts`
 
 **Acceptance Criteria:**
+
 - [ ] `pnpm --filter @sfos/iam typecheck` exits 0
 - [ ] `pnpm --filter @sfos/iam test` exits 0 (no test files yet = pass)
 - [ ] `pnpm --filter @sfos/iam lint` exits 0
@@ -211,11 +213,13 @@ Expected: both exit 0 (no source = no errors, no test files = empty suite passes
 **Goal:** Three idempotent migration files that create the `module_iam` schema, all four tables, and RLS policies.
 
 **Files:**
+
 - Create: `modules/module-iam/src/migrations/0001_iam_schema.sql`
 - Create: `modules/module-iam/src/migrations/0002_iam_tables.sql`
 - Create: `modules/module-iam/src/migrations/0003_iam_rls.sql`
 
 **Acceptance Criteria:**
+
 - [ ] All three files apply cleanly against a fresh DB (after `packages/db` migrations 0000–0003)
 - [ ] `module_iam_role` exists with NOBYPASSRLS (except when explicitly granted)
 - [ ] All four tables exist in schema `module_iam`
@@ -480,10 +484,12 @@ COMMIT;
 **Goal:** TypeScript Drizzle schema mirroring the SQL tables, plus a typed `IamDb` factory.
 
 **Files:**
+
 - Create: `modules/module-iam/src/server/db/schema.ts`
 - Create: `modules/module-iam/src/server/db/client.ts`
 
 **Acceptance Criteria:**
+
 - [ ] `pnpm --filter @sfos/iam typecheck` exits 0
 - [ ] All four tables present in schema with correct column types
 - [ ] `IamDb` type is exported and used in `IamServiceCtx`
@@ -517,12 +523,7 @@ export const invitationStatusEnum = pgEnum('invitation_status', [
   'expired'
 ]);
 
-export const membershipRoleEnum = pgEnum('membership_role', [
-  'owner',
-  'admin',
-  'member',
-  'viewer'
-]);
+export const membershipRoleEnum = pgEnum('membership_role', ['owner', 'admin', 'member', 'viewer']);
 
 export const credentials = iamSchema.table('credentials', {
   userId: uuid('user_id').primaryKey(),
@@ -534,8 +535,12 @@ export const credentials = iamSchema.table('credentials', {
   lastPasswordChangedAt: timestamp('last_password_changed_at', { withTimezone: true })
     .notNull()
     .default(sql`now()`),
-  createdAt: timestamp('created_at', { withTimezone: true }).notNull().default(sql`now()`),
-  updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().default(sql`now()`)
+  createdAt: timestamp('created_at', { withTimezone: true })
+    .notNull()
+    .default(sql`now()`),
+  updatedAt: timestamp('updated_at', { withTimezone: true })
+    .notNull()
+    .default(sql`now()`)
 });
 
 export const sessions = iamSchema.table('sessions', {
@@ -550,8 +555,12 @@ export const sessions = iamSchema.table('sessions', {
   rotatedFromSessionId: text('rotated_from_session_id'),
   ipAddress: inet('ip_address'),
   userAgent: text('user_agent'),
-  createdAt: timestamp('created_at', { withTimezone: true }).notNull().default(sql`now()`),
-  updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().default(sql`now()`)
+  createdAt: timestamp('created_at', { withTimezone: true })
+    .notNull()
+    .default(sql`now()`),
+  updatedAt: timestamp('updated_at', { withTimezone: true })
+    .notNull()
+    .default(sql`now()`)
 });
 
 export const invitations = iamSchema.table('invitations', {
@@ -567,7 +576,9 @@ export const invitations = iamSchema.table('invitations', {
   acceptedBy: uuid('accepted_by'),
   revokedAt: timestamp('revoked_at', { withTimezone: true }),
   revokedBy: uuid('revoked_by'),
-  createdAt: timestamp('created_at', { withTimezone: true }).notNull().default(sql`now()`)
+  createdAt: timestamp('created_at', { withTimezone: true })
+    .notNull()
+    .default(sql`now()`)
 });
 
 export const passwordResetTokens = iamSchema.table('password_reset_tokens', {
@@ -576,7 +587,9 @@ export const passwordResetTokens = iamSchema.table('password_reset_tokens', {
   tokenHash: text('token_hash').notNull(),
   expiresAt: timestamp('expires_at', { withTimezone: true }).notNull(),
   consumedAt: timestamp('consumed_at', { withTimezone: true }),
-  createdAt: timestamp('created_at', { withTimezone: true }).notNull().default(sql`now()`)
+  createdAt: timestamp('created_at', { withTimezone: true })
+    .notNull()
+    .default(sql`now()`)
 });
 
 export type Credential = typeof credentials.$inferSelect;
@@ -633,6 +646,7 @@ export const createIamDb = (url: string, opts: ClientOptions = {}): IamClient =>
 **Goal:** Four focused crypto/lockout helpers, each with a dedicated unit test. No DB dependency.
 
 **Files:**
+
 - Create: `modules/module-iam/src/internal/password-hash.ts`
 - Create: `modules/module-iam/src/internal/session-token.ts`
 - Create: `modules/module-iam/src/internal/crypto-compare.ts`
@@ -641,6 +655,7 @@ export const createIamDb = (url: string, opts: ClientOptions = {}): IamClient =>
 - Create: `modules/module-iam/tests/sessions.test.ts` (token unit tests only in this task)
 
 **Acceptance Criteria:**
+
 - [ ] `pnpm --filter @sfos/iam test` passes all unit tests
 - [ ] `hashPassword` uses argon2id algorithm (parameter visible in hash string prefix `$argon2id$`)
 - [ ] Two `hashPassword` calls on the same string produce different output (salted)
@@ -667,8 +682,7 @@ const OPTIONS = {
   parallelism: 4
 } as const;
 
-export const hashPassword = (plaintext: string): Promise<string> =>
-  hash(plaintext, OPTIONS);
+export const hashPassword = (plaintext: string): Promise<string> => hash(plaintext, OPTIONS);
 
 export const verifyPassword = (storedHash: string, plaintext: string): Promise<boolean> =>
   verify(storedHash, plaintext);
@@ -680,8 +694,7 @@ export const verifyPassword = (storedHash: string, plaintext: string): Promise<b
 import { randomBytes, createHash } from 'node:crypto';
 
 /** Cryptographically random 32-byte token, base64url-encoded. Never stored. */
-export const generateOpaqueToken = (): string =>
-  randomBytes(32).toString('base64url');
+export const generateOpaqueToken = (): string => randomBytes(32).toString('base64url');
 
 /** SHA-256 hex digest. Stored in DB; plaintext never persisted. */
 export const hashToken = (token: string): string =>
@@ -880,6 +893,7 @@ Expected: all credential + session-token unit tests pass.
 **Goal:** Zod schemas and TypeScript types for all IAM I/O boundaries. `SessionPublicView` and `SessionInternalView` are explicitly separated.
 
 **Files:**
+
 - Create: `modules/module-iam/src/contracts/login.ts`
 - Create: `modules/module-iam/src/contracts/session.ts`
 - Create: `modules/module-iam/src/contracts/invite.ts`
@@ -887,6 +901,7 @@ Expected: all credential + session-token unit tests pass.
 - Create: `modules/module-iam/src/contracts/index.ts`
 
 **Acceptance Criteria:**
+
 - [ ] `pnpm --filter @sfos/iam typecheck` exits 0
 - [ ] `SessionPublicView` does NOT contain `accessTokenHash`, `refreshTokenHash`, `ipAddress`, or `revokedAt`
 - [ ] `SessionInternalView` contains all DB fields (used only inside service layer)
@@ -980,7 +995,10 @@ import { z } from 'zod';
 const MembershipRoleSchema = z.enum(['owner', 'admin', 'member', 'viewer']);
 
 export const InviteInputSchema = z.object({
-  email: z.string().email().transform((e) => e.toLowerCase()),
+  email: z
+    .string()
+    .email()
+    .transform((e) => e.toLowerCase()),
   role: MembershipRoleSchema.default('member')
 });
 export type InviteInput = z.infer<typeof InviteInputSchema>;
@@ -1014,7 +1032,10 @@ export type RevokeInvitationInput = z.infer<typeof RevokeInvitationInputSchema>;
 import { z } from 'zod';
 
 export const PasswordResetRequestInputSchema = z.object({
-  email: z.string().email().transform((e) => e.toLowerCase())
+  email: z
+    .string()
+    .email()
+    .transform((e) => e.toLowerCase())
 });
 export type PasswordResetRequestInput = z.infer<typeof PasswordResetRequestInputSchema>;
 
@@ -1028,14 +1049,36 @@ export type PasswordResetInput = z.infer<typeof PasswordResetInputSchema>;
 - [ ] **Step 5: Create `src/contracts/index.ts`**
 
 ```typescript
-export type { LoginInput, LoginOutput, LogoutInput, ValidateSessionInput, ValidateSessionOutput } from './login.js';
-export { LoginInputSchema, LoginOutputSchema, LogoutInputSchema, ValidateSessionInputSchema, ValidateSessionOutputSchema } from './login.js';
+export type {
+  LoginInput,
+  LoginOutput,
+  LogoutInput,
+  ValidateSessionInput,
+  ValidateSessionOutput
+} from './login.js';
+export {
+  LoginInputSchema,
+  LoginOutputSchema,
+  LogoutInputSchema,
+  ValidateSessionInputSchema,
+  ValidateSessionOutputSchema
+} from './login.js';
 
 export type { SessionPublicView, SessionInternalView } from './session.js';
 export { SessionPublicViewSchema, SessionInternalViewSchema } from './session.js';
 
-export type { InviteInput, InviteView, AcceptInvitationInput, RevokeInvitationInput } from './invite.js';
-export { InviteInputSchema, InviteViewSchema, AcceptInvitationInputSchema, RevokeInvitationInputSchema } from './invite.js';
+export type {
+  InviteInput,
+  InviteView,
+  AcceptInvitationInput,
+  RevokeInvitationInput
+} from './invite.js';
+export {
+  InviteInputSchema,
+  InviteViewSchema,
+  AcceptInvitationInputSchema,
+  RevokeInvitationInputSchema
+} from './invite.js';
 
 export type { PasswordResetRequestInput, PasswordResetInput } from './password.js';
 export { PasswordResetRequestInputSchema, PasswordResetInputSchema } from './password.js';
@@ -1048,6 +1091,7 @@ export { PasswordResetRequestInputSchema, PasswordResetInputSchema } from './pas
 **Goal:** All shared server-layer types and constants that the API services depend on.
 
 **Files:**
+
 - Create: `modules/module-iam/src/server/constants.ts`
 - Create: `modules/module-iam/src/server/errors.ts`
 - Create: `modules/module-iam/src/server/context.ts`
@@ -1055,6 +1099,7 @@ export { PasswordResetRequestInputSchema, PasswordResetInputSchema } from './pas
 - Create: `modules/module-iam/src/server/events.ts`
 
 **Acceptance Criteria:**
+
 - [ ] `pnpm --filter @sfos/iam typecheck` exits 0
 - [ ] `IamError` is a discriminated union — no `message: string` field (forces callers to switch on `code`)
 - [ ] `IamServiceCtx` has `systemDb: IamDb` and `tenantDb: SfosDb` as separate fields
@@ -1070,10 +1115,10 @@ export { PasswordResetRequestInputSchema, PasswordResetInputSchema } from './pas
 ```typescript
 export const IAM_MODULE_ID = 'sfos.iam' as const;
 
-export const ACCESS_TOKEN_TTL_MS  = 15 * 60 * 1000;          // 15 minutes
+export const ACCESS_TOKEN_TTL_MS = 15 * 60 * 1000; // 15 minutes
 export const REFRESH_TOKEN_TTL_MS = 7 * 24 * 60 * 60 * 1000; // 7 days
-export const INVITE_TTL_MS        = 7 * 24 * 60 * 60 * 1000; // 7 days
-export const RESET_TOKEN_TTL_MS   = 60 * 60 * 1000;           // 1 hour
+export const INVITE_TTL_MS = 7 * 24 * 60 * 60 * 1000; // 7 days
+export const RESET_TOKEN_TTL_MS = 60 * 60 * 1000; // 1 hour
 ```
 
 - [ ] **Step 2: Create `src/server/errors.ts`**
@@ -1131,12 +1176,12 @@ export interface IamServiceCtx {
 import type { PermissionKey } from '@sfos/contracts/manifest';
 
 export const IAM_PERMISSIONS = {
-  SESSION_READ:          'iam.session.read'          as PermissionKey,
-  SESSION_REVOKE:        'iam.session.revoke'        as PermissionKey,
-  INVITATION_CREATE:     'iam.invitation.create'     as PermissionKey,
-  INVITATION_READ:       'iam.invitation.read'       as PermissionKey,
-  INVITATION_REVOKE:     'iam.invitation.revoke'     as PermissionKey,
-  CREDENTIAL_CHANGE_PW:  'iam.credential.change_password' as PermissionKey,
+  SESSION_READ: 'iam.session.read' as PermissionKey,
+  SESSION_REVOKE: 'iam.session.revoke' as PermissionKey,
+  INVITATION_CREATE: 'iam.invitation.create' as PermissionKey,
+  INVITATION_READ: 'iam.invitation.read' as PermissionKey,
+  INVITATION_REVOKE: 'iam.invitation.revoke' as PermissionKey,
+  CREDENTIAL_CHANGE_PW: 'iam.credential.change_password' as PermissionKey
 } as const;
 ```
 
@@ -1149,14 +1194,14 @@ import type { EventEnvelope, EventActor } from '@sfos/events';
 import { IAM_MODULE_ID } from './constants.js';
 
 export const IAM_EVENTS = {
-  SESSION_CREATED:            'iam.session.created'           ,
-  SESSION_REVOKED:            'iam.session.revoked'           ,
-  AUTH_FAILED:                'iam.auth.failed'               ,
-  INVITATION_CREATED:         'iam.invitation.created'        ,
-  INVITATION_ACCEPTED:        'iam.invitation.accepted'       ,
-  INVITATION_REVOKED:         'iam.invitation.revoked'        ,
-  CREDENTIAL_PASSWORD_CHANGED:'iam.credential.password_changed',
-  CREDENTIAL_LOCKED:          'iam.credential.locked'         ,
+  SESSION_CREATED: 'iam.session.created',
+  SESSION_REVOKED: 'iam.session.revoked',
+  AUTH_FAILED: 'iam.auth.failed',
+  INVITATION_CREATED: 'iam.invitation.created',
+  INVITATION_ACCEPTED: 'iam.invitation.accepted',
+  INVITATION_REVOKED: 'iam.invitation.revoked',
+  CREDENTIAL_PASSWORD_CHANGED: 'iam.credential.password_changed',
+  CREDENTIAL_LOCKED: 'iam.credential.locked'
 } as const;
 
 export type IamEventType = (typeof IAM_EVENTS)[keyof typeof IAM_EVENTS];
@@ -1184,10 +1229,12 @@ export const userActor = (userId: string): EventActor => ({
 **Goal:** Core authentication service functions with full lockout enforcement, event emission, and happy-path + integration tests.
 
 **Files:**
+
 - Create: `modules/module-iam/src/server/api/auth.ts`
 - Modify: `modules/module-iam/tests/sessions.test.ts` (add integration tests)
 
 **Acceptance Criteria:**
+
 - [ ] `login` with valid credentials returns `accessToken` + `refreshToken` + `sessionId`
 - [ ] `login` with wrong password increments `failed_attempts` and returns `invalid_credentials`
 - [ ] `login` after 5 wrong attempts returns `account_locked`
@@ -1235,9 +1282,9 @@ export const login = async (
   const { systemDb, events, logger, correlationId, companyId } = ctx;
 
   // 1. Lookup user by email — raw SQL because core.users is outside module_iam schema.
-  const userRows = await systemDb.execute(
+  const userRows = (await systemDb.execute(
     sql`SELECT id FROM core.users WHERE lower(email) = ${input.email.toLowerCase()} LIMIT 1`
-  ) as Array<{ id: string }>;
+  )) as Array<{ id: string }>;
 
   // Do not reveal whether the email exists — always return invalid_credentials.
   if (!userRows[0]) {
@@ -1270,65 +1317,69 @@ export const login = async (
       .set({ failedAttempts: next.failedAttempts, lockedUntil: next.lockedUntil })
       .where(eq(credentials.userId, userId));
 
-    await events.emit(buildIamEnvelope({
-      type: IAM_EVENTS.AUTH_FAILED,
-      version: '1.0',
-      company_id: companyId,
-      emitted_by: systemActor(),
-      correlation_id: correlationId,
-      payload: { userId, reason: 'invalid_password', failedAttempts: next.failedAttempts },
-      audit_required: true
-    }));
-
-    if (isLocked(next)) {
-      await events.emit(buildIamEnvelope({
-        type: IAM_EVENTS.CREDENTIAL_LOCKED,
+    await events.emit(
+      buildIamEnvelope({
+        type: IAM_EVENTS.AUTH_FAILED,
         version: '1.0',
         company_id: companyId,
         emitted_by: systemActor(),
         correlation_id: correlationId,
-        payload: { userId, lockedUntil: next.lockedUntil },
+        payload: { userId, reason: 'invalid_password', failedAttempts: next.failedAttempts },
         audit_required: true
-      }));
+      })
+    );
+
+    if (isLocked(next)) {
+      await events.emit(
+        buildIamEnvelope({
+          type: IAM_EVENTS.CREDENTIAL_LOCKED,
+          version: '1.0',
+          company_id: companyId,
+          emitted_by: systemActor(),
+          correlation_id: correlationId,
+          payload: { userId, lockedUntil: next.lockedUntil },
+          audit_required: true
+        })
+      );
     }
 
     return Err({ code: 'invalid_credentials' });
   }
 
   // 5. Create session atomically with lockout reset.
-  const accessToken   = generateOpaqueToken();
-  const refreshToken  = generateOpaqueToken();
-  const sessionId     = newULID();
-  const now           = new Date();
-  const expiresAt     = new Date(now.getTime() + ACCESS_TOKEN_TTL_MS);
+  const accessToken = generateOpaqueToken();
+  const refreshToken = generateOpaqueToken();
+  const sessionId = newULID();
+  const now = new Date();
+  const expiresAt = new Date(now.getTime() + ACCESS_TOKEN_TTL_MS);
   const refreshExpiresAt = new Date(now.getTime() + REFRESH_TOKEN_TTL_MS);
 
   await systemDb.transaction(async (tx) => {
-    await tx.update(credentials)
-      .set(resetLockoutState())
-      .where(eq(credentials.userId, userId));
+    await tx.update(credentials).set(resetLockoutState()).where(eq(credentials.userId, userId));
 
     await tx.insert(sessions).values({
       id: sessionId,
       userId,
       companyId,
-      accessTokenHash:  hashToken(accessToken),
+      accessTokenHash: hashToken(accessToken),
       refreshTokenHash: hashToken(refreshToken),
       expiresAt,
       refreshExpiresAt
     });
   });
 
-  await events.emit(buildIamEnvelope({
-    type: IAM_EVENTS.SESSION_CREATED,
-    version: '1.0',
-    company_id: companyId,
-    emitted_by: userActor(userId),
-    correlation_id: correlationId,
-    source_entity_id: sessionId,
-    payload: { sessionId, userId },
-    audit_required: false
-  }));
+  await events.emit(
+    buildIamEnvelope({
+      type: IAM_EVENTS.SESSION_CREATED,
+      version: '1.0',
+      company_id: companyId,
+      emitted_by: userActor(userId),
+      correlation_id: correlationId,
+      source_entity_id: sessionId,
+      payload: { sessionId, userId },
+      audit_required: false
+    })
+  );
 
   return Ok({
     accessToken,
@@ -1354,20 +1405,23 @@ export const logout = async (
     return Err({ code: 'session_not_found' });
   }
 
-  await systemDb.update(sessions)
+  await systemDb
+    .update(sessions)
     .set({ revokedAt: new Date() })
     .where(eq(sessions.id, input.sessionId));
 
-  await events.emit(buildIamEnvelope({
-    type: IAM_EVENTS.SESSION_REVOKED,
-    version: '1.0',
-    company_id: companyId,
-    emitted_by: userActor(actorUserId!),
-    correlation_id: correlationId,
-    source_entity_id: input.sessionId,
-    payload: { sessionId: input.sessionId, userId: actorUserId },
-    audit_required: true
-  }));
+  await events.emit(
+    buildIamEnvelope({
+      type: IAM_EVENTS.SESSION_REVOKED,
+      version: '1.0',
+      company_id: companyId,
+      emitted_by: userActor(actorUserId!),
+      correlation_id: correlationId,
+      source_entity_id: input.sessionId,
+      payload: { sessionId: input.sessionId, userId: actorUserId },
+      audit_required: true
+    })
+  );
 
   return Ok(undefined);
 };
@@ -1449,11 +1503,16 @@ describe.skipIf(skip)('auth service — integration', () => {
     await seedUser(iamClient.db, 'carol@test.example', 'SecurePass123!');
     const ctx = makeIamCtx(iamClient.db, TEST_COMPANY_ID);
 
-    const loginResult = await login(ctx, { email: 'carol@test.example', password: 'SecurePass123!' });
+    const loginResult = await login(ctx, {
+      email: 'carol@test.example',
+      password: 'SecurePass123!'
+    });
     expect(loginResult.ok).toBe(true);
     if (!loginResult.ok) return;
 
-    const validateResult = await validateSession(ctx, { accessToken: loginResult.value.accessToken });
+    const validateResult = await validateSession(ctx, {
+      accessToken: loginResult.value.accessToken
+    });
     expect(validateResult.ok).toBe(true);
     if (!validateResult.ok) return;
     expect(validateResult.value.userId).toBe(loginResult.value.userId);
@@ -1471,24 +1530,35 @@ import type { EventEnvelope } from '@sfos/events';
 import type { IamDb } from '../src/server/db/client.js';
 import type { IamServiceCtx } from '../src/server/context.js';
 import { hashPassword } from '../src/internal/password-hash.js';
-import { credentials, sessions, invitations, passwordResetTokens } from '../src/server/db/schema.js';
+import {
+  credentials,
+  sessions,
+  invitations,
+  passwordResetTokens
+} from '../src/server/db/schema.js';
 
 export const TEST_COMPANY_ID: CompanyId = asCompanyId('00000000-0000-4000-a000-000000000001');
 
 export const makeRecordingEvents = () => {
   const emitted: EventEnvelope[] = [];
   return {
-    events: { emit: async (env: EventEnvelope) => { emitted.push(env); } },
+    events: {
+      emit: async (env: EventEnvelope) => {
+        emitted.push(env);
+      }
+    },
     emitted
   };
 };
 
 const makeLogger = () => ({
   debug: () => {},
-  info:  () => {},
-  warn:  () => {},
+  info: () => {},
+  warn: () => {},
   error: () => {},
-  child: function() { return makeLogger(); }
+  child: function () {
+    return makeLogger();
+  }
 });
 
 export const makeIamCtx = (
@@ -1513,11 +1583,11 @@ export const seedUser = async (
   email: string,
   password: string
 ): Promise<{ userId: string }> => {
-  const [row] = await db.execute(
+  const [row] = (await db.execute(
     sql`INSERT INTO core.users (email) VALUES (${email})
         ON CONFLICT (lower(email)) DO UPDATE SET email = EXCLUDED.email
         RETURNING id`
-  ) as Array<{ id: string }>;
+  )) as Array<{ id: string }>;
   const userId = row!.id;
   const passwordHash = await hashPassword(password);
   await db.execute(
@@ -1544,10 +1614,12 @@ export const cleanup = async (db: IamDb): Promise<void> => {
 **Goal:** Atomic invite create/accept/revoke with transactional membership creation and mandatory race-condition safety.
 
 **Files:**
+
 - Create: `modules/module-iam/src/server/api/invitations.ts`
 - Create: `modules/module-iam/tests/invitations.test.ts`
 
 **Acceptance Criteria:**
+
 - [ ] `createInvitation` stores only `hashToken(token)` — plaintext not in DB
 - [ ] `createInvitation` emits `iam.invitation.created`
 - [ ] `acceptInvitation` uses `UPDATE … WHERE status = 'pending' RETURNING` — single atomic consume
@@ -1575,7 +1647,12 @@ import { buildIamEnvelope, IAM_EVENTS, userActor } from '../events.js';
 import { INVITE_TTL_MS } from '../constants.js';
 import type { IamServiceCtx } from '../context.js';
 import type { IamError } from '../errors.js';
-import type { InviteInput, InviteView, AcceptInvitationInput, RevokeInvitationInput } from '../../contracts/invite.js';
+import type {
+  InviteInput,
+  InviteView,
+  AcceptInvitationInput,
+  RevokeInvitationInput
+} from '../../contracts/invite.js';
 
 export const createInvitation = async (
   ctx: IamServiceCtx,
@@ -1600,16 +1677,18 @@ export const createInvitation = async (
 
   if (!inv) return Err({ code: 'user_not_found' });
 
-  await events.emit(buildIamEnvelope({
-    type: IAM_EVENTS.INVITATION_CREATED,
-    version: '1.0',
-    company_id: companyId,
-    emitted_by: userActor(actorUserId!),
-    correlation_id: correlationId,
-    source_entity_id: inv.id,
-    payload: { invitationId: inv.id, email: input.email, role: input.role },
-    audit_required: true
-  }));
+  await events.emit(
+    buildIamEnvelope({
+      type: IAM_EVENTS.INVITATION_CREATED,
+      version: '1.0',
+      company_id: companyId,
+      emitted_by: userActor(actorUserId!),
+      correlation_id: correlationId,
+      source_entity_id: inv.id,
+      payload: { invitationId: inv.id, email: input.email, role: input.role },
+      audit_required: true
+    })
+  );
 
   return Ok({
     token,
@@ -1634,7 +1713,7 @@ export const acceptInvitation = async (
 
   // Atomic consume: only updates the row if status = 'pending' AND not expired.
   // Returns the row if updated, empty if already consumed/revoked/expired.
-  const consumed = await systemDb.execute(sql`
+  const consumed = (await systemDb.execute(sql`
     UPDATE module_iam.invitations
     SET    status      = 'accepted',
            accepted_at = now(),
@@ -1643,17 +1722,23 @@ export const acceptInvitation = async (
       AND  status      = 'pending'
       AND  expires_at  > now()
     RETURNING id, company_id, invited_email, invited_role, status
-  `) as Array<{ id: string; company_id: string; invited_email: string; invited_role: string; status: string }>;
+  `)) as Array<{
+    id: string;
+    company_id: string;
+    invited_email: string;
+    invited_role: string;
+    status: string;
+  }>;
 
   if (!consumed[0]) {
     // Distinguish expired/consumed/not-found for precise error.
-    const existing = await systemDb.execute(sql`
+    const existing = (await systemDb.execute(sql`
       SELECT status FROM module_iam.invitations WHERE token_hash = ${tokenHash} LIMIT 1
-    `) as Array<{ status: string }>;
+    `)) as Array<{ status: string }>;
 
     if (!existing[0]) return Err({ code: 'invitation_not_found' });
     if (existing[0].status === 'accepted') return Err({ code: 'invitation_already_accepted' });
-    if (existing[0].status === 'revoked')  return Err({ code: 'invitation_already_revoked' });
+    if (existing[0].status === 'revoked') return Err({ code: 'invitation_already_revoked' });
     return Err({ code: 'invitation_expired' });
   }
 
@@ -1672,16 +1757,18 @@ export const acceptInvitation = async (
     }
   );
 
-  await events.emit(buildIamEnvelope({
-    type: IAM_EVENTS.INVITATION_ACCEPTED,
-    version: '1.0',
-    company_id: companyId,
-    emitted_by: userActor(input.acceptingUserId),
-    correlation_id: correlationId,
-    source_entity_id: inv.id,
-    payload: { invitationId: inv.id, acceptedBy: input.acceptingUserId, role: inv.invited_role },
-    audit_required: true
-  }));
+  await events.emit(
+    buildIamEnvelope({
+      type: IAM_EVENTS.INVITATION_ACCEPTED,
+      version: '1.0',
+      company_id: companyId,
+      emitted_by: userActor(input.acceptingUserId),
+      correlation_id: correlationId,
+      source_entity_id: inv.id,
+      payload: { invitationId: inv.id, acceptedBy: input.acceptingUserId, role: inv.invited_role },
+      audit_required: true
+    })
+  );
 
   return Ok(undefined);
 };
@@ -1692,7 +1779,7 @@ export const revokeInvitation = async (
 ): Promise<Result<void, IamError>> => {
   const { systemDb, events, correlationId, companyId, actorUserId } = ctx;
 
-  const revoked = await systemDb.execute(sql`
+  const revoked = (await systemDb.execute(sql`
     UPDATE module_iam.invitations
     SET    status     = 'revoked',
            revoked_at = now(),
@@ -1701,30 +1788,32 @@ export const revokeInvitation = async (
       AND  company_id = ${companyId}::uuid
       AND  status     = 'pending'
     RETURNING id
-  `) as Array<{ id: string }>;
+  `)) as Array<{ id: string }>;
 
   if (!revoked[0]) {
-    const existing = await systemDb.execute(sql`
+    const existing = (await systemDb.execute(sql`
       SELECT status FROM module_iam.invitations
       WHERE id = ${input.invitationId}::uuid AND company_id = ${companyId}::uuid LIMIT 1
-    `) as Array<{ status: string }>;
+    `)) as Array<{ status: string }>;
 
     if (!existing[0]) return Err({ code: 'invitation_not_found' });
-    if (existing[0].status === 'revoked')  return Err({ code: 'invitation_already_revoked' });
+    if (existing[0].status === 'revoked') return Err({ code: 'invitation_already_revoked' });
     if (existing[0].status === 'accepted') return Err({ code: 'invitation_already_accepted' });
     return Err({ code: 'invitation_expired' });
   }
 
-  await events.emit(buildIamEnvelope({
-    type: IAM_EVENTS.INVITATION_REVOKED,
-    version: '1.0',
-    company_id: companyId,
-    emitted_by: userActor(actorUserId!),
-    correlation_id: correlationId,
-    source_entity_id: revoked[0].id,
-    payload: { invitationId: revoked[0].id, revokedBy: actorUserId },
-    audit_required: true
-  }));
+  await events.emit(
+    buildIamEnvelope({
+      type: IAM_EVENTS.INVITATION_REVOKED,
+      version: '1.0',
+      company_id: companyId,
+      emitted_by: userActor(actorUserId!),
+      correlation_id: correlationId,
+      source_entity_id: revoked[0].id,
+      payload: { invitationId: revoked[0].id, revokedBy: actorUserId },
+      audit_required: true
+    })
+  );
 
   return Ok(undefined);
 };
@@ -1735,7 +1824,11 @@ export const revokeInvitation = async (
 ```typescript
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 import { createIamDb } from '../src/server/db/client.js';
-import { createInvitation, acceptInvitation, revokeInvitation } from '../src/server/api/invitations.js';
+import {
+  createInvitation,
+  acceptInvitation,
+  revokeInvitation
+} from '../src/server/api/invitations.js';
 import { makeIamCtx, seedUser, TEST_COMPANY_ID, cleanup } from './helpers.js';
 import { asUserId } from '@sfos/contracts/brands';
 
@@ -1773,7 +1866,11 @@ describe.skipIf(skip)('invitations service — integration', () => {
     expect(created.ok).toBe(true);
     if (!created.ok) return;
 
-    const { userId: acceptorId } = await seedUser(iamClient.db, 'acceptor@test.example', 'Pass123!');
+    const { userId: acceptorId } = await seedUser(
+      iamClient.db,
+      'acceptor@test.example',
+      'Pass123!'
+    );
 
     const first = await acceptInvitation(ctx, {
       token: created.value.token,
@@ -1817,11 +1914,13 @@ describe.skipIf(skip)('invitations service — integration', () => {
 **Goal:** `listSessions`, `revokeSession`, `revokeAllSessions` and `requestPasswordReset`, `consumePasswordReset` with integration tests.
 
 **Files:**
+
 - Create: `modules/module-iam/src/server/api/sessions.ts`
 - Create: `modules/module-iam/src/server/api/password.ts`
 - Create: `modules/module-iam/tests/password-reset.test.ts`
 
 **Acceptance Criteria:**
+
 - [ ] `listSessions` returns only non-revoked, non-expired sessions for the actor in the company
 - [ ] `revokeSession` sets `revoked_at` and emits `iam.session.revoked`
 - [ ] `revokeAllSessions` revokes every active session for the actor in the company
@@ -1879,7 +1978,7 @@ export const revokeSession = async (
 ): Promise<Result<void, IamError>> => {
   const { systemDb, events, correlationId, companyId, actorUserId } = ctx;
 
-  const updated = await systemDb.execute(sql`
+  const updated = (await systemDb.execute(sql`
     UPDATE module_iam.sessions
     SET    revoked_at = now()
     WHERE  id         = ${sessionId}
@@ -1887,20 +1986,22 @@ export const revokeSession = async (
       AND  company_id = ${companyId}::uuid
       AND  revoked_at IS NULL
     RETURNING id
-  `) as Array<{ id: string }>;
+  `)) as Array<{ id: string }>;
 
   if (!updated[0]) return Err({ code: 'session_not_found' });
 
-  await events.emit(buildIamEnvelope({
-    type: IAM_EVENTS.SESSION_REVOKED,
-    version: '1.0',
-    company_id: companyId,
-    emitted_by: userActor(actorUserId!),
-    correlation_id: correlationId,
-    source_entity_id: sessionId,
-    payload: { sessionId, userId: actorUserId },
-    audit_required: true
-  }));
+  await events.emit(
+    buildIamEnvelope({
+      type: IAM_EVENTS.SESSION_REVOKED,
+      version: '1.0',
+      company_id: companyId,
+      emitted_by: userActor(actorUserId!),
+      correlation_id: correlationId,
+      source_entity_id: sessionId,
+      payload: { sessionId, userId: actorUserId },
+      audit_required: true
+    })
+  );
 
   return Ok(undefined);
 };
@@ -1910,26 +2011,28 @@ export const revokeAllSessions = async (
 ): Promise<Result<{ count: number }, IamError>> => {
   const { systemDb, events, correlationId, companyId, actorUserId } = ctx;
 
-  const updated = await systemDb.execute(sql`
+  const updated = (await systemDb.execute(sql`
     UPDATE module_iam.sessions
     SET    revoked_at = now()
     WHERE  user_id    = ${actorUserId!}::uuid
       AND  company_id = ${companyId}::uuid
       AND  revoked_at IS NULL
     RETURNING id
-  `) as Array<{ id: string }>;
+  `)) as Array<{ id: string }>;
 
   for (const s of updated) {
-    await events.emit(buildIamEnvelope({
-      type: IAM_EVENTS.SESSION_REVOKED,
-      version: '1.0',
-      company_id: companyId,
-      emitted_by: userActor(actorUserId!),
-      correlation_id: correlationId,
-      source_entity_id: s.id,
-      payload: { sessionId: s.id, userId: actorUserId },
-      audit_required: true
-    }));
+    await events.emit(
+      buildIamEnvelope({
+        type: IAM_EVENTS.SESSION_REVOKED,
+        version: '1.0',
+        company_id: companyId,
+        emitted_by: userActor(actorUserId!),
+        correlation_id: correlationId,
+        source_entity_id: s.id,
+        payload: { sessionId: s.id, userId: actorUserId },
+        audit_required: true
+      })
+    );
   }
 
   return Ok({ count: updated.length });
@@ -1958,9 +2061,9 @@ export const requestPasswordReset = async (
 ): Promise<Result<{ token: string } | null, IamError>> => {
   const { systemDb, events, correlationId, companyId } = ctx;
 
-  const userRows = await systemDb.execute(
+  const userRows = (await systemDb.execute(
     sql`SELECT id FROM core.users WHERE lower(email) = ${input.email} LIMIT 1`
-  ) as Array<{ id: string }>;
+  )) as Array<{ id: string }>;
 
   // Return Ok(null) regardless — no user enumeration via different response shapes.
   if (!userRows[0]) return Ok(null);
@@ -1973,15 +2076,19 @@ export const requestPasswordReset = async (
     expiresAt: new Date(Date.now() + RESET_TOKEN_TTL_MS)
   });
 
-  await events.emit(buildIamEnvelope({
-    type: 'iam.credential.password_reset_requested' as Parameters<typeof buildIamEnvelope>[0]['type'],
-    version: '1.0',
-    company_id: companyId,
-    emitted_by: systemActor(),
-    correlation_id: correlationId,
-    payload: { userId },
-    audit_required: true
-  }));
+  await events.emit(
+    buildIamEnvelope({
+      type: 'iam.credential.password_reset_requested' as Parameters<
+        typeof buildIamEnvelope
+      >[0]['type'],
+      version: '1.0',
+      company_id: companyId,
+      emitted_by: systemActor(),
+      correlation_id: correlationId,
+      payload: { userId },
+      audit_required: true
+    })
+  );
 
   // Returning token here so callers (BFF/email service) can send it.
   // In production the BFF sends the email; the token never reaches the HTTP response.
@@ -1997,13 +2104,13 @@ export const consumePasswordReset = async (
 
   // Atomic consume: SELECT FOR UPDATE then UPDATE, all in one transaction.
   const result = await systemDb.transaction(async (tx) => {
-    const rows = await tx.execute(sql`
+    const rows = (await tx.execute(sql`
       SELECT id, user_id, consumed_at, expires_at
       FROM module_iam.password_reset_tokens
       WHERE token_hash = ${tokenHash}
       LIMIT 1
       FOR UPDATE
-    `) as Array<{ id: string; user_id: string; consumed_at: Date | null; expires_at: Date }>;
+    `)) as Array<{ id: string; user_id: string; consumed_at: Date | null; expires_at: Date }>;
 
     if (!rows[0]) return Err<IamError>({ code: 'reset_token_invalid' });
     const row = rows[0];
@@ -2018,8 +2125,14 @@ export const consumePasswordReset = async (
     `);
 
     const newHash = await hashPassword(input.newPassword);
-    await tx.update(credentials)
-      .set({ passwordHash: newHash, lastPasswordChangedAt: new Date(), failedAttempts: 0, lockedUntil: null })
+    await tx
+      .update(credentials)
+      .set({
+        passwordHash: newHash,
+        lastPasswordChangedAt: new Date(),
+        failedAttempts: 0,
+        lockedUntil: null
+      })
       .where(eq(credentials.userId, row.user_id));
 
     return Ok(row.user_id);
@@ -2027,15 +2140,17 @@ export const consumePasswordReset = async (
 
   if (!result.ok) return Err(result.error);
 
-  await events.emit(buildIamEnvelope({
-    type: IAM_EVENTS.CREDENTIAL_PASSWORD_CHANGED,
-    version: '1.0',
-    company_id: companyId,
-    emitted_by: userActor(result.value),
-    correlation_id: correlationId,
-    payload: { userId: result.value, method: 'reset' },
-    audit_required: true
-  }));
+  await events.emit(
+    buildIamEnvelope({
+      type: IAM_EVENTS.CREDENTIAL_PASSWORD_CHANGED,
+      version: '1.0',
+      company_id: companyId,
+      emitted_by: userActor(result.value),
+      correlation_id: correlationId,
+      payload: { userId: result.value, method: 'reset' },
+      audit_required: true
+    })
+  );
 
   return Ok(undefined);
 };
@@ -2056,8 +2171,13 @@ const skip = !DB_URL;
 describe.skipIf(skip)('password reset — integration', () => {
   let iamClient: ReturnType<typeof createIamDb>;
 
-  beforeAll(async () => { iamClient = createIamDb(DB_URL!); });
-  afterAll(async () => { await cleanup(iamClient.db); await iamClient.close(); });
+  beforeAll(async () => {
+    iamClient = createIamDb(DB_URL!);
+  });
+  afterAll(async () => {
+    await cleanup(iamClient.db);
+    await iamClient.close();
+  });
 
   it('requestPasswordReset returns Ok(null) for unknown email (no enumeration)', async () => {
     const ctx = makeIamCtx(iamClient.db, TEST_COMPANY_ID);
@@ -2081,7 +2201,10 @@ describe.skipIf(skip)('password reset — integration', () => {
     });
     expect(consumeResult.ok).toBe(true);
 
-    const loginResult = await login(ctx, { email: 'resetme@test.example', password: 'NewPassword456!' });
+    const loginResult = await login(ctx, {
+      email: 'resetme@test.example',
+      password: 'NewPassword456!'
+    });
     expect(loginResult.ok).toBe(true);
   });
 
@@ -2093,7 +2216,10 @@ describe.skipIf(skip)('password reset — integration', () => {
     expect(reqResult.ok).toBe(true);
     if (!reqResult.ok || !reqResult.value) return;
 
-    await consumePasswordReset(ctx, { token: reqResult.value.token, newPassword: 'NewPass123456!' });
+    await consumePasswordReset(ctx, {
+      token: reqResult.value.token,
+      newPassword: 'NewPass123456!'
+    });
 
     const second = await consumePasswordReset(ctx, {
       token: reqResult.value.token,
@@ -2113,6 +2239,7 @@ describe.skipIf(skip)('password reset — integration', () => {
 **Goal:** Wire everything together — `ModuleLifecycle`, `manifest.ts`, public barrel `src/index.ts`, and `MODULE.md`.
 
 **Files:**
+
 - Create: `modules/module-iam/src/server/index.ts`
 - Create: `modules/module-iam/src/index.ts`
 - Create: `modules/module-iam/manifest.ts`
@@ -2120,6 +2247,7 @@ describe.skipIf(skip)('password reset — integration', () => {
 - Create: `modules/module-iam/OWNERSHIP.md`
 
 **Acceptance Criteria:**
+
 - [ ] `pnpm --filter @sfos/iam typecheck` exits 0
 - [ ] `src/index.ts` does NOT re-export anything from `src/internal/`
 - [ ] Manifest validates against `ManifestSchema` (run `ManifestSchema.parse(manifest)`)
@@ -2185,11 +2313,19 @@ export { requestPasswordReset, consumePasswordReset } from './server/api/passwor
 
 // Contracts (re-exported via contracts subpath — direct import preferred)
 export type {
-  LoginInput, LoginOutput, LogoutInput,
-  ValidateSessionInput, ValidateSessionOutput
+  LoginInput,
+  LoginOutput,
+  LogoutInput,
+  ValidateSessionInput,
+  ValidateSessionOutput
 } from './contracts/login.js';
 export type { SessionPublicView } from './contracts/session.js';
-export type { InviteInput, InviteView, AcceptInvitationInput, RevokeInvitationInput } from './contracts/invite.js';
+export type {
+  InviteInput,
+  InviteView,
+  AcceptInvitationInput,
+  RevokeInvitationInput
+} from './contracts/invite.js';
 export type { PasswordResetRequestInput, PasswordResetInput } from './contracts/password.js';
 ```
 
@@ -2247,29 +2383,90 @@ export default defineManifest({
   },
 
   permissions: [
-    { key: IAM_PERMISSIONS.SESSION_READ,      default_roles: ['member', 'admin', 'owner'], scope: 'tenant' },
-    { key: IAM_PERMISSIONS.SESSION_REVOKE,    default_roles: ['member', 'admin', 'owner'], scope: 'tenant' },
-    { key: IAM_PERMISSIONS.INVITATION_CREATE, default_roles: ['admin', 'owner'],           scope: 'tenant' },
-    { key: IAM_PERMISSIONS.INVITATION_READ,   default_roles: ['admin', 'owner'],           scope: 'tenant' },
-    { key: IAM_PERMISSIONS.INVITATION_REVOKE, default_roles: ['admin', 'owner'],           scope: 'tenant' },
-    { key: IAM_PERMISSIONS.CREDENTIAL_CHANGE_PW, default_roles: ['member', 'admin', 'owner'], scope: 'resource' }
+    {
+      key: IAM_PERMISSIONS.SESSION_READ,
+      default_roles: ['member', 'admin', 'owner'],
+      scope: 'tenant'
+    },
+    {
+      key: IAM_PERMISSIONS.SESSION_REVOKE,
+      default_roles: ['member', 'admin', 'owner'],
+      scope: 'tenant'
+    },
+    { key: IAM_PERMISSIONS.INVITATION_CREATE, default_roles: ['admin', 'owner'], scope: 'tenant' },
+    { key: IAM_PERMISSIONS.INVITATION_READ, default_roles: ['admin', 'owner'], scope: 'tenant' },
+    { key: IAM_PERMISSIONS.INVITATION_REVOKE, default_roles: ['admin', 'owner'], scope: 'tenant' },
+    {
+      key: IAM_PERMISSIONS.CREDENTIAL_CHANGE_PW,
+      default_roles: ['member', 'admin', 'owner'],
+      scope: 'resource'
+    }
   ],
 
   events_produced: [
-    { type: IAM_EVENTS.SESSION_CREATED,             version: '1.0', audit_required: false, ai_readable: false, since_module_version: '0.1.0' },
-    { type: IAM_EVENTS.SESSION_REVOKED,             version: '1.0', audit_required: true,  ai_readable: false, since_module_version: '0.1.0' },
-    { type: IAM_EVENTS.AUTH_FAILED,                 version: '1.0', audit_required: true,  ai_readable: false, since_module_version: '0.1.0' },
-    { type: IAM_EVENTS.INVITATION_CREATED,          version: '1.0', audit_required: true,  ai_readable: false, since_module_version: '0.1.0' },
-    { type: IAM_EVENTS.INVITATION_ACCEPTED,         version: '1.0', audit_required: true,  ai_readable: true,  since_module_version: '0.1.0' },
-    { type: IAM_EVENTS.INVITATION_REVOKED,          version: '1.0', audit_required: true,  ai_readable: false, since_module_version: '0.1.0' },
-    { type: IAM_EVENTS.CREDENTIAL_PASSWORD_CHANGED, version: '1.0', audit_required: true,  ai_readable: false, since_module_version: '0.1.0' },
-    { type: IAM_EVENTS.CREDENTIAL_LOCKED,           version: '1.0', audit_required: true,  ai_readable: false, since_module_version: '0.1.0' }
+    {
+      type: IAM_EVENTS.SESSION_CREATED,
+      version: '1.0',
+      audit_required: false,
+      ai_readable: false,
+      since_module_version: '0.1.0'
+    },
+    {
+      type: IAM_EVENTS.SESSION_REVOKED,
+      version: '1.0',
+      audit_required: true,
+      ai_readable: false,
+      since_module_version: '0.1.0'
+    },
+    {
+      type: IAM_EVENTS.AUTH_FAILED,
+      version: '1.0',
+      audit_required: true,
+      ai_readable: false,
+      since_module_version: '0.1.0'
+    },
+    {
+      type: IAM_EVENTS.INVITATION_CREATED,
+      version: '1.0',
+      audit_required: true,
+      ai_readable: false,
+      since_module_version: '0.1.0'
+    },
+    {
+      type: IAM_EVENTS.INVITATION_ACCEPTED,
+      version: '1.0',
+      audit_required: true,
+      ai_readable: true,
+      since_module_version: '0.1.0'
+    },
+    {
+      type: IAM_EVENTS.INVITATION_REVOKED,
+      version: '1.0',
+      audit_required: true,
+      ai_readable: false,
+      since_module_version: '0.1.0'
+    },
+    {
+      type: IAM_EVENTS.CREDENTIAL_PASSWORD_CHANGED,
+      version: '1.0',
+      audit_required: true,
+      ai_readable: false,
+      since_module_version: '0.1.0'
+    },
+    {
+      type: IAM_EVENTS.CREDENTIAL_LOCKED,
+      version: '1.0',
+      audit_required: true,
+      ai_readable: false,
+      since_module_version: '0.1.0'
+    }
   ],
 
   events_consumed: [],
 
   metadata: {
-    description: 'Identity & Access Management — authentication, sessions, invitations, password reset.'
+    description:
+      'Identity & Access Management — authentication, sessions, invitations, password reset.'
   }
 });
 ```
@@ -2294,9 +2491,11 @@ Both must exit 0.
 **Goal:** Security-focused test suite covering timing attacks, brute-force lockout, cross-tenant bleed, single-use token enforcement, and concurrent accept race conditions.
 
 **Files:**
+
 - Create: `modules/module-iam/tests/adversarial.test.ts`
 
 **Acceptance Criteria:**
+
 - [ ] Timing test: `validateSession` with wrong token takes approximately same time as `validateSession` with right-but-expired token (within 50ms; use `hashToken` path is always exercised)
 - [ ] Brute-force: 5 failed logins lock the account; 6th login returns `account_locked` not `invalid_credentials`
 - [ ] Cross-tenant: a session token from company A cannot be validated in company B context
@@ -2328,15 +2527,20 @@ const skip = !DB_URL;
 describe.skipIf(skip)('adversarial', () => {
   let iamClient: ReturnType<typeof createIamDb>;
 
-  beforeAll(async () => { iamClient = createIamDb(DB_URL!); });
-  afterAll(async () => { await cleanup(iamClient.db); await iamClient.close(); });
+  beforeAll(async () => {
+    iamClient = createIamDb(DB_URL!);
+  });
+  afterAll(async () => {
+    await cleanup(iamClient.db);
+    await iamClient.close();
+  });
 
   it('AUTH-1: unknown email returns same error code as wrong password (no user enumeration)', async () => {
     await seedUser(iamClient.db, 'exists@test.example', 'Password123!');
     const ctx = makeIamCtx(iamClient.db, TEST_COMPANY_ID);
 
     const wrongPw = await login(ctx, { email: 'exists@test.example', password: 'wrong' });
-    const noUser  = await login(ctx, { email: 'ghost@test.example',  password: 'wrong' });
+    const noUser = await login(ctx, { email: 'ghost@test.example', password: 'wrong' });
 
     expect(wrongPw.ok).toBe(false);
     expect(noUser.ok).toBe(false);
@@ -2367,7 +2571,10 @@ describe.skipIf(skip)('adversarial', () => {
       await login(ctx, { email: 'lockedcorrect@test.example', password: 'wrong' });
     }
 
-    const result = await login(ctx, { email: 'lockedcorrect@test.example', password: 'RealPass123!' });
+    const result = await login(ctx, {
+      email: 'lockedcorrect@test.example',
+      password: 'RealPass123!'
+    });
     expect(result.ok).toBe(false);
     if (result.ok) return;
     expect(result.error.code).toBe('account_locked');
@@ -2381,7 +2588,9 @@ describe.skipIf(skip)('adversarial', () => {
     if (!loginResult.ok) return;
 
     const { accessToken, sessionId, userId } = loginResult.value;
-    const ctxWithActor = makeIamCtx(iamClient.db, TEST_COMPANY_ID, { actorUserId: asUserId(userId) });
+    const ctxWithActor = makeIamCtx(iamClient.db, TEST_COMPANY_ID, {
+      actorUserId: asUserId(userId)
+    });
 
     await logout(ctxWithActor, { sessionId });
 
@@ -2419,7 +2628,10 @@ describe.skipIf(skip)('adversarial', () => {
     const { userId: acceptorId } = await seedUser(iamClient.db, 'racers@test.example', 'Pass123!');
     const ctx = makeIamCtx(iamClient.db, TEST_COMPANY_ID, { actorUserId: asUserId(adminId) });
 
-    const created = await createInvitation(ctx, { email: 'race-target@test.example', role: 'member' });
+    const created = await createInvitation(ctx, {
+      email: 'race-target@test.example',
+      role: 'member'
+    });
     expect(created.ok).toBe(true);
     if (!created.ok) return;
     const { token } = created.value;
@@ -2431,7 +2643,7 @@ describe.skipIf(skip)('adversarial', () => {
     ]);
 
     const successes = [r1, r2].filter((r) => r.ok).length;
-    const failures  = [r1, r2].filter((r) => !r.ok).length;
+    const failures = [r1, r2].filter((r) => !r.ok).length;
     expect(successes).toBe(1);
     expect(failures).toBe(1);
 
@@ -2449,7 +2661,10 @@ describe.skipIf(skip)('adversarial', () => {
     if (!req.ok || !req.value) return;
 
     await consumePasswordReset(ctx, { token: req.value.token, newPassword: 'NewPass123456!' });
-    const second = await consumePasswordReset(ctx, { token: req.value.token, newPassword: 'AnotherNew456!' });
+    const second = await consumePasswordReset(ctx, {
+      token: req.value.token,
+      newPassword: 'AnotherNew456!'
+    });
 
     expect(second.ok).toBe(false);
     if (second.ok) return;
@@ -2481,37 +2696,40 @@ describe.skipIf(skip)('adversarial', () => {
 
 ### Spec Coverage Check
 
-| Requirement | Task |
-|---|---|
-| Framework-agnostic service layer | Tasks 7–9 (pure `fn(ctx, input)`) |
-| login/logout/session validation | Task 7 |
-| argon2id password hashing | Task 4 |
-| Opaque session token + SHA-256 hashing | Task 4 |
-| Invitation create/accept/revoke | Task 8 |
-| Membership role assignment | Task 8 (`acceptInvitation` writes to `core.memberships`) |
-| Permission checks | Tasks 6+7+8 (IAM_PERMISSIONS) |
-| IAM event emission via envelope/outbox | Tasks 6+7+8+9 |
-| Audit writes for security actions | Tasks 7+8+9 (`audit_required: true`) |
-| Diagnostics/self-check integration | Task 10 (`preFlight` checks env) |
-| Happy-path tests | Tasks 7–9 |
-| Adversarial/security tests | Task 11 |
-| `src/internal/` separation | Task 4 |
-| `src/contracts/` + `SessionPublicView`/`SessionInternalView` | Task 5 |
-| Strict barrel discipline (no internal leakage) | Task 10 |
-| `tests/adversarial.test.ts` mandatory | Task 11 |
-| `ui/placeholder.ts` unchanged | Task 1 |
-| `rotated_from_session_id` column | Task 2/3 |
-| Auth failure event (`iam.auth.failed`) | Task 6/7 |
-| Transactional atomic invite accept | Task 8 |
-| IAM does NOT bypass core policies | Task 8 (`withTenantContext` on `tenantDb`) |
+| Requirement                                                  | Task                                                     |
+| ------------------------------------------------------------ | -------------------------------------------------------- |
+| Framework-agnostic service layer                             | Tasks 7–9 (pure `fn(ctx, input)`)                        |
+| login/logout/session validation                              | Task 7                                                   |
+| argon2id password hashing                                    | Task 4                                                   |
+| Opaque session token + SHA-256 hashing                       | Task 4                                                   |
+| Invitation create/accept/revoke                              | Task 8                                                   |
+| Membership role assignment                                   | Task 8 (`acceptInvitation` writes to `core.memberships`) |
+| Permission checks                                            | Tasks 6+7+8 (IAM_PERMISSIONS)                            |
+| IAM event emission via envelope/outbox                       | Tasks 6+7+8+9                                            |
+| Audit writes for security actions                            | Tasks 7+8+9 (`audit_required: true`)                     |
+| Diagnostics/self-check integration                           | Task 10 (`preFlight` checks env)                         |
+| Happy-path tests                                             | Tasks 7–9                                                |
+| Adversarial/security tests                                   | Task 11                                                  |
+| `src/internal/` separation                                   | Task 4                                                   |
+| `src/contracts/` + `SessionPublicView`/`SessionInternalView` | Task 5                                                   |
+| Strict barrel discipline (no internal leakage)               | Task 10                                                  |
+| `tests/adversarial.test.ts` mandatory                        | Task 11                                                  |
+| `ui/placeholder.ts` unchanged                                | Task 1                                                   |
+| `rotated_from_session_id` column                             | Task 2/3                                                 |
+| Auth failure event (`iam.auth.failed`)                       | Task 6/7                                                 |
+| Transactional atomic invite accept                           | Task 8                                                   |
+| IAM does NOT bypass core policies                            | Task 8 (`withTenantContext` on `tenantDb`)               |
 
 ### No HTTP / OAuth / SSO / MFA / policy DSL
+
 All service functions are pure `fn(ctx, input) → Result<T, IamError>`. No Express/Hono adapters. No OAuth flows. No MFA. No dynamic RBAC engine. ✓
 
 ### No Placeholders
+
 Reviewed — all steps contain actual code. ✓
 
 ### Type Consistency
+
 - `IamDb` defined in Task 3, used in Task 6 (`IamServiceCtx.systemDb: IamDb`) ✓
 - `IamServiceCtx` defined in Task 6, used throughout Tasks 7–9 ✓
 - `IamError` discriminated union defined in Task 6, used in all service return types ✓

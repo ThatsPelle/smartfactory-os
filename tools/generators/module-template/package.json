@@ -21,7 +21,13 @@
       "import": "./dist/manifest.js"
     }
   },
-  "files": ["dist", "src", "manifest.ts", "MODULE.md", "OWNERSHIP.md"],
+  "files": [
+    "dist",
+    "src",
+    "manifest.ts",
+    "MODULE.md",
+    "OWNERSHIP.md"
+  ],
   "scripts": {
     "build": "tsc -b",
     "typecheck": "tsc --noEmit",

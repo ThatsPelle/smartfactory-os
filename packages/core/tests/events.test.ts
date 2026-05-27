@@ -57,9 +57,9 @@ describe('event bus + ownership', () => {
 
   it('rejects emission whose source_module does not match the emitter', async () => {
     const bus = new EventBus();
-    await expect(
-      bus.emit('crm', env({ source: 'warehouse' }))
-    ).rejects.toBeInstanceOf(ForeignEmissionError);
+    await expect(bus.emit('crm', env({ source: 'warehouse' }))).rejects.toBeInstanceOf(
+      ForeignEmissionError
+    );
   });
 
   it('accepts emission whose source_module matches', async () => {

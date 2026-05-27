@@ -34,26 +34,81 @@ export default defineManifest({
     ordering: 'sequential'
   },
   permissions: [
-    { key: 'iam.session.read',               default_roles: ['member', 'admin'], scope: 'tenant' },
-    { key: 'iam.session.revoke',             default_roles: ['member', 'admin'], scope: 'tenant' },
-    { key: 'iam.invitation.create',          default_roles: ['admin'],           scope: 'tenant' },
-    { key: 'iam.invitation.read',            default_roles: ['member', 'admin'], scope: 'tenant' },
-    { key: 'iam.invitation.revoke',          default_roles: ['admin'],           scope: 'tenant' },
+    { key: 'iam.session.read', default_roles: ['member', 'admin'], scope: 'tenant' },
+    { key: 'iam.session.revoke', default_roles: ['member', 'admin'], scope: 'tenant' },
+    { key: 'iam.invitation.create', default_roles: ['admin'], scope: 'tenant' },
+    { key: 'iam.invitation.read', default_roles: ['member', 'admin'], scope: 'tenant' },
+    { key: 'iam.invitation.revoke', default_roles: ['admin'], scope: 'tenant' },
     { key: 'iam.credential.change_password', default_roles: ['member', 'admin'], scope: 'tenant' }
   ],
   events_produced: [
-    { type: IAM_EVENTS.SESSION_CREATED,                     version: '1.0', audit_required: true,  ai_readable: false, since_module_version: '0.1.0' },
-    { type: IAM_EVENTS.SESSION_REVOKED,                     version: '1.0', audit_required: true,  ai_readable: false, since_module_version: '0.1.0' },
-    { type: IAM_EVENTS.AUTH_FAILED,                         version: '1.0', audit_required: true,  ai_readable: false, since_module_version: '0.1.0' },
-    { type: IAM_EVENTS.INVITATION_CREATED,                  version: '1.0', audit_required: true,  ai_readable: false, since_module_version: '0.1.0' },
-    { type: IAM_EVENTS.INVITATION_ACCEPTED,                 version: '1.0', audit_required: true,  ai_readable: false, since_module_version: '0.1.0' },
-    { type: IAM_EVENTS.INVITATION_REVOKED,                  version: '1.0', audit_required: true,  ai_readable: false, since_module_version: '0.1.0' },
-    { type: IAM_EVENTS.CREDENTIAL_PASSWORD_CHANGED,         version: '1.0', audit_required: true,  ai_readable: false, since_module_version: '0.1.0' },
-    { type: IAM_EVENTS.CREDENTIAL_LOCKED,                   version: '1.0', audit_required: true,  ai_readable: false, since_module_version: '0.1.0' },
-    { type: IAM_EVENTS.CREDENTIAL_PASSWORD_RESET_REQUESTED, version: '1.0', audit_required: true,  ai_readable: false, since_module_version: '0.1.0' }
+    {
+      type: IAM_EVENTS.SESSION_CREATED,
+      version: '1.0',
+      audit_required: true,
+      ai_readable: false,
+      since_module_version: '0.1.0'
+    },
+    {
+      type: IAM_EVENTS.SESSION_REVOKED,
+      version: '1.0',
+      audit_required: true,
+      ai_readable: false,
+      since_module_version: '0.1.0'
+    },
+    {
+      type: IAM_EVENTS.AUTH_FAILED,
+      version: '1.0',
+      audit_required: true,
+      ai_readable: false,
+      since_module_version: '0.1.0'
+    },
+    {
+      type: IAM_EVENTS.INVITATION_CREATED,
+      version: '1.0',
+      audit_required: true,
+      ai_readable: false,
+      since_module_version: '0.1.0'
+    },
+    {
+      type: IAM_EVENTS.INVITATION_ACCEPTED,
+      version: '1.0',
+      audit_required: true,
+      ai_readable: false,
+      since_module_version: '0.1.0'
+    },
+    {
+      type: IAM_EVENTS.INVITATION_REVOKED,
+      version: '1.0',
+      audit_required: true,
+      ai_readable: false,
+      since_module_version: '0.1.0'
+    },
+    {
+      type: IAM_EVENTS.CREDENTIAL_PASSWORD_CHANGED,
+      version: '1.0',
+      audit_required: true,
+      ai_readable: false,
+      since_module_version: '0.1.0'
+    },
+    {
+      type: IAM_EVENTS.CREDENTIAL_LOCKED,
+      version: '1.0',
+      audit_required: true,
+      ai_readable: false,
+      since_module_version: '0.1.0'
+    },
+    {
+      type: IAM_EVENTS.CREDENTIAL_PASSWORD_RESET_REQUESTED,
+      version: '1.0',
+      audit_required: true,
+      ai_readable: false,
+      since_module_version: '0.1.0'
+    }
   ],
   events_consumed: [],
   metadata: {
-    description: 'Identity and Access Management — authentication, sessions, invitations, and password reset.'
+    description:
+      'Identity and Access Management — authentication, sessions, invitations, and password reset.'
   }
 });

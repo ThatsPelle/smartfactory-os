@@ -33,10 +33,7 @@ export const companyModules = coreSchema.table(
     disabledAt: timestamp('disabled_at', { withTimezone: true })
   },
   (t) => ({
-    companyModuleUnique: unique('company_modules_company_module_unique').on(
-      t.companyId,
-      t.moduleId
-    )
+    companyModuleUnique: unique('company_modules_company_module_unique').on(t.companyId, t.moduleId)
   })
 );
 

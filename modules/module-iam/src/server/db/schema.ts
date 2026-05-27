@@ -1,13 +1,5 @@
 import { sql } from 'drizzle-orm';
-import {
-  boolean,
-  inet,
-  integer,
-  pgSchema,
-  text,
-  timestamp,
-  uuid
-} from 'drizzle-orm/pg-core';
+import { boolean, inet, integer, pgSchema, text, timestamp, uuid } from 'drizzle-orm/pg-core';
 
 import { membershipRole as membershipRoleEnum } from '@sfos/db/schema';
 
@@ -30,9 +22,13 @@ export const credentials = iamSchema.table('credentials', {
   lastPasswordChangedAt: timestamp('last_password_changed_at', { withTimezone: true })
     .notNull()
     .default(sql`now()`),
-  createdAt: timestamp('created_at', { withTimezone: true }).notNull().default(sql`now()`),
+  createdAt: timestamp('created_at', { withTimezone: true })
+    .notNull()
+    .default(sql`now()`),
   // Managed by credentials_touch_updated_at trigger; never set explicitly.
-  updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().default(sql`now()`)
+  updatedAt: timestamp('updated_at', { withTimezone: true })
+    .notNull()
+    .default(sql`now()`)
 });
 
 export const sessions = iamSchema.table('sessions', {
@@ -47,9 +43,13 @@ export const sessions = iamSchema.table('sessions', {
   rotatedFromSessionId: text('rotated_from_session_id'),
   ipAddress: inet('ip_address'),
   userAgent: text('user_agent'),
-  createdAt: timestamp('created_at', { withTimezone: true }).notNull().default(sql`now()`),
+  createdAt: timestamp('created_at', { withTimezone: true })
+    .notNull()
+    .default(sql`now()`),
   // Managed by sessions_touch_updated_at trigger; never set explicitly.
-  updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().default(sql`now()`)
+  updatedAt: timestamp('updated_at', { withTimezone: true })
+    .notNull()
+    .default(sql`now()`)
 });
 
 export const invitations = iamSchema.table('invitations', {
@@ -65,7 +65,9 @@ export const invitations = iamSchema.table('invitations', {
   acceptedBy: uuid('accepted_by'),
   revokedAt: timestamp('revoked_at', { withTimezone: true }),
   revokedBy: uuid('revoked_by'),
-  createdAt: timestamp('created_at', { withTimezone: true }).notNull().default(sql`now()`)
+  createdAt: timestamp('created_at', { withTimezone: true })
+    .notNull()
+    .default(sql`now()`)
 });
 
 export const passwordResetTokens = iamSchema.table('password_reset_tokens', {
@@ -74,7 +76,9 @@ export const passwordResetTokens = iamSchema.table('password_reset_tokens', {
   tokenHash: text('token_hash').notNull().unique(),
   expiresAt: timestamp('expires_at', { withTimezone: true }).notNull(),
   consumedAt: timestamp('consumed_at', { withTimezone: true }),
-  createdAt: timestamp('created_at', { withTimezone: true }).notNull().default(sql`now()`)
+  createdAt: timestamp('created_at', { withTimezone: true })
+    .notNull()
+    .default(sql`now()`)
 });
 
 export type Credential = typeof credentials.$inferSelect;

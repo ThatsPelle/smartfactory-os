@@ -44,27 +44,15 @@ describe('capability resolution', () => {
   });
 
   it('satisfies matches name+major exactly and version range loosely', () => {
-    expect(
-      satisfies(
-        { capability: 'a.b@1', versionRange: '>=1.0.0' },
-        'a.b@1',
-        '1.2.3'
-      )
-    ).toBe(true);
-    expect(
-      satisfies(
-        { capability: 'a.b@2', versionRange: '>=1.0.0' },
-        'a.b@1',
-        '1.2.3'
-      )
-    ).toBe(false);
-    expect(
-      satisfies(
-        { capability: 'a.b@1', versionRange: '>=2.0.0' },
-        'a.b@1',
-        '1.2.3'
-      )
-    ).toBe(false);
+    expect(satisfies({ capability: 'a.b@1', versionRange: '>=1.0.0' }, 'a.b@1', '1.2.3')).toBe(
+      true
+    );
+    expect(satisfies({ capability: 'a.b@2', versionRange: '>=1.0.0' }, 'a.b@1', '1.2.3')).toBe(
+      false
+    );
+    expect(satisfies({ capability: 'a.b@1', versionRange: '>=2.0.0' }, 'a.b@1', '1.2.3')).toBe(
+      false
+    );
   });
 
   it('topologically orders providers before consumers', () => {

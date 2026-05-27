@@ -18,11 +18,7 @@ export class ForeignEmissionError extends Error {
   readonly declaredSourceModule: string;
   readonly eventType: string;
 
-  constructor(
-    emittingModuleId: string,
-    declaredSourceModule: string,
-    eventType: string
-  ) {
+  constructor(emittingModuleId: string, declaredSourceModule: string, eventType: string) {
     super(
       `Module "${emittingModuleId}" tried to emit event "${eventType}" ` +
         `with source_module="${declaredSourceModule}". Modules may only emit ` +

@@ -23,12 +23,12 @@ Examples:
 
 ## Hybrid: generated + handwritten
 
-| What                                                        | How               |
-| ----------------------------------------------------------- | ----------------- |
+| What                                                        | How                                       |
+| ----------------------------------------------------------- | ----------------------------------------- |
 | Tables, columns, FKs, indexes, enums                        | `drizzle-kit generate` from `src/schema/` |
-| `SET LOCAL` helpers, `CREATE POLICY`, immutability triggers | Handwritten SQL   |
-| Backfills, data migrations                                  | Handwritten SQL   |
-| Postgres extensions, role creation                          | Handwritten SQL   |
+| `SET LOCAL` helpers, `CREATE POLICY`, immutability triggers | Handwritten SQL                           |
+| Backfills, data migrations                                  | Handwritten SQL                           |
+| Postgres extensions, role creation                          | Handwritten SQL                           |
 
 drizzle-kit overwrites generated migrations on regeneration. Handwritten
 migrations are filed next to generated ones in the same sequence and are
@@ -38,7 +38,7 @@ never regenerated.
 
 A migration that has been merged to `main` is immutable. If it was wrong:
 
-1. Add a new migration that *forward-fixes* it.
+1. Add a new migration that _forward-fixes_ it.
 2. Do NOT edit the merged file.
 
 Rationale: any environment past the broken migration cannot re-run it. The

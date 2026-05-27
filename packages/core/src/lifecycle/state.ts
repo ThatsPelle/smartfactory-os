@@ -50,9 +50,7 @@ const TRANSITIONS: Readonly<Record<ModuleState, readonly ModuleState[]>> = {
 export const canTransition = (from: ModuleState, to: ModuleState): boolean =>
   TRANSITIONS[from].includes(to);
 
-export const allowedTransitions = (from: ModuleState): readonly ModuleState[] =>
-  TRANSITIONS[from];
+export const allowedTransitions = (from: ModuleState): readonly ModuleState[] => TRANSITIONS[from];
 
 /** A state from which the module is still serving traffic. */
-export const isServing = (s: ModuleState): boolean =>
-  s === 'initialized' || s === 'degraded';
+export const isServing = (s: ModuleState): boolean => s === 'initialized' || s === 'degraded';

@@ -36,7 +36,7 @@ interface ModuleDiagnostic {
 
 `true` iff every module ended in `initialized` or `disabled`. The
 operator can treat `ready === false` as a deploy-time failure; the
-detail of *why* lives in `modules[i].state` + `loadIssues` +
+detail of _why_ lives in `modules[i].state` + `loadIssues` +
 `capabilityCycles`.
 
 ### `phaseDurations`
@@ -111,9 +111,9 @@ canonical form.
 
 ## Where diagnostics live in code
 
-| File | Role |
-| --- | --- |
-| `src/diagnostics/state.ts` | `RuntimeDiagnostics` + `ModuleDiagnostic` types |
-| `src/diagnostics/reporter.ts` | `renderDiagnostics` ASCII printer |
-| `src/runtime/bootstrap.ts` | composes the snapshot from registry + engine + load result |
-| `src/lifecycle/engine.ts` | `history()` feeds `lifecycleHistory` |
+| File                          | Role                                                       |
+| ----------------------------- | ---------------------------------------------------------- |
+| `src/diagnostics/state.ts`    | `RuntimeDiagnostics` + `ModuleDiagnostic` types            |
+| `src/diagnostics/reporter.ts` | `renderDiagnostics` ASCII printer                          |
+| `src/runtime/bootstrap.ts`    | composes the snapshot from registry + engine + load result |
+| `src/lifecycle/engine.ts`     | `history()` feeds `lifecycleHistory`                       |

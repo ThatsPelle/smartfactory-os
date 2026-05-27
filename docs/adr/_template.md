@@ -29,8 +29,8 @@ imposes on future work.
 
 ## Alternatives considered
 
-| Option | Why not |
-|---|---|
+| Option        | Why not        |
+| ------------- | -------------- |
 | (alternative) | (brief reason) |
 
 ## References
