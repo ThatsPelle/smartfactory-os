@@ -66,3 +66,15 @@ export const cleanup = async (db: IamDb): Promise<void> => {
   await db.execute(sql`DELETE FROM module_iam.credentials`);
   await db.execute(sql`DELETE FROM core.users WHERE email LIKE '%@test.example'`);
 };
+
+export const seedMembership = async (
+  db: IamDb,
+  userId: string,
+  companyId: string = TEST_COMPANY_ID
+): Promise<void> => {
+  await db.execute(
+    sql`INSERT INTO core.memberships (user_id, company_id, role)
+        VALUES (${userId}::uuid, ${companyId}::uuid, 'member')
+        ON CONFLICT (user_id, company_id) DO NOTHING`
+  );
+};

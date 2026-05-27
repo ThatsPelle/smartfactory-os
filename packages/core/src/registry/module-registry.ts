@@ -68,7 +68,12 @@ export class InMemoryModuleRegistry implements ModuleRegistry {
   }
 
   list(): readonly RegisteredModule[] {
-    return this.#order.map((id) => this.#byId.get(id)!).filter(Boolean);
+    const out: RegisteredModule[] = [];
+    for (const id of this.#order) {
+      const mod = this.#byId.get(id);
+      if (mod !== undefined) out.push(mod);
+    }
+    return out;
   }
 
   find(moduleId: string): RegisteredModule | undefined {
@@ -117,10 +122,11 @@ export class InMemoryModuleRegistry implements ModuleRegistry {
     const availableVersions = new Map<string, string>();
     for (const req of requirements) {
       const providers = this.#byCapability.get(req) ?? [];
-      if (providers.length === 0) {
+      const first = providers[0];
+      if (first === undefined) {
         missing.push(req);
       } else {
-        availableVersions.set(req, providers[0]!.manifest.identity.version);
+        availableVersions.set(req, first.manifest.identity.version);
       }
     }
     return { satisfied: missing.length === 0, missing, availableVersions };

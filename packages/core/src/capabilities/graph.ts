@@ -67,6 +67,18 @@ const tarjanSCC = (
   const stack: string[] = [];
   const sccs: string[][] = [];
 
+  // Tarjan's invariant: any node `v` written to `indices`/`lowlink` always
+  // has values present afterward. `getNumber` centralizes that invariant
+  // so the algorithm body reads cleanly and a violation surfaces loudly
+  // (a thrown invariant is better than `undefined` propagating silently).
+  const getNumber = (m: Map<string, number>, v: string): number => {
+    const n = m.get(v);
+    if (n === undefined) {
+      throw new Error(`tarjanSCC invariant violated: missing entry for "${v}"`);
+    }
+    return n;
+  };
+
   const strongconnect = (v: string): void => {
     indices.set(v, index);
     lowlink.set(v, index);
@@ -76,16 +88,18 @@ const tarjanSCC = (
     for (const w of edges.get(v) ?? []) {
       if (!indices.has(w)) {
         strongconnect(w);
-        lowlink.set(v, Math.min(lowlink.get(v)!, lowlink.get(w)!));
+        lowlink.set(v, Math.min(getNumber(lowlink, v), getNumber(lowlink, w)));
       } else if (onStack.has(w)) {
-        lowlink.set(v, Math.min(lowlink.get(v)!, indices.get(w)!));
+        lowlink.set(v, Math.min(getNumber(lowlink, v), getNumber(indices, w)));
       }
     }
     if (lowlink.get(v) === indices.get(v)) {
       const component: string[] = [];
-      // eslint-disable-next-line no-constant-condition
-      while (true) {
-        const w = stack.pop()!;
+      for (;;) {
+        const w = stack.pop();
+        if (w === undefined) {
+          throw new Error(`tarjanSCC invariant violated: stack empty while popping SCC for "${v}"`);
+        }
         onStack.delete(w);
         component.push(w);
         if (w === v) break;
@@ -98,7 +112,11 @@ const tarjanSCC = (
     if (!indices.has(v)) strongconnect(v);
   }
   // Cycles are SCCs of size > 1, or self-loops (size 1 with a self-edge).
-  return sccs.filter((c) => c.length > 1 || (c.length === 1 && (edges.get(c[0]!) ?? []).includes(c[0]!)));
+  return sccs.filter((c) => {
+    if (c.length > 1) return true;
+    const only = c[0];
+    return only !== undefined && (edges.get(only) ?? []).includes(only);
+  });
 };
 
 const topoSort = (
@@ -114,7 +132,8 @@ const topoSort = (
   for (const [v, deps] of remaining) if (deps.size === 0) queue.push(v);
 
   while (queue.length > 0) {
-    const v = queue.shift()!;
+    const v = queue.shift();
+    if (v === undefined) break;
     order.push(v);
     for (const [w, deps] of remaining) {
       if (deps.delete(v) && deps.size === 0) queue.push(w);
@@ -143,7 +162,14 @@ export const resolveCapabilities = (
     edges.set(id, []);
     providersByModule.set(id, []);
     const reqs = m.manifest.dependencies.requires;
-    for (const req of reqs) {
+    for (const rawReq of reqs) {
+      // Manifest fields are snake_case; the internal CapabilityRequirement
+      // type is camelCase. Normalize at the boundary so satisfies/diagnostics
+      // can rely on the canonical shape.
+      const req: CapabilityRequirement = {
+        capability: rawReq.capability,
+        versionRange: rawReq.version_range
+      };
       const candidates = providersByKey.get(req.capability) ?? [];
       const matches = candidates.filter((c) =>
         satisfies(req, req.capability, c.manifest.identity.version)
@@ -161,10 +187,17 @@ export const resolveCapabilities = (
           arr.push(req);
           unresolvedByModule.set(id, arr);
         } else {
-          const providerId = matches[0]!.manifest.identity.id;
+          const winner = matches[0];
+          if (winner === undefined) continue;
+          const providerId = winner.manifest.identity.id;
           if (providerId !== id) {
-            edges.get(id)!.push(providerId);
-            providersByModule.get(id)!.push(providerId);
+            const edgeList = edges.get(id);
+            const provList = providersByModule.get(id);
+            if (edgeList === undefined || provList === undefined) {
+              throw new Error(`resolveCapabilities invariant violated: missing bookkeeping for "${id}"`);
+            }
+            edgeList.push(providerId);
+            provList.push(providerId);
           }
         }
       }

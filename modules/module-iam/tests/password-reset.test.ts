@@ -2,7 +2,8 @@ import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 import { createIamDb } from '../src/server/db/client.js';
 import { requestPasswordReset, consumePasswordReset } from '../src/server/api/password.js';
 import { login } from '../src/server/api/auth.js';
-import { makeIamCtx, seedUser, cleanup } from './helpers.js';
+import { makeIamCtx, seedUser, seedMembership, cleanup } from './helpers.js';
+import { IAM_EVENTS } from '../src/server/events.js';
 
 const DB_URL = process.env['TEST_DATABASE_URL'];
 
@@ -21,8 +22,9 @@ describe.skipIf(!DB_URL)('password reset — integration', () => {
   });
 
   it('reset flow: request → consume → login with new password succeeds', async () => {
-    await seedUser(iamClient.db, 'resetme@test.example', 'OldPassword123!');
-    const { ctx } = makeIamCtx(iamClient.db);
+    const { userId } = await seedUser(iamClient.db, 'resetme@test.example', 'OldPassword123!');
+    await seedMembership(iamClient.db, userId);
+    const { ctx, emitted } = makeIamCtx(iamClient.db);
 
     const reqResult = await requestPasswordReset(ctx, { email: 'resetme@test.example' });
     expect(reqResult.ok).toBe(true);
@@ -33,13 +35,15 @@ describe.skipIf(!DB_URL)('password reset — integration', () => {
       newPassword: 'NewPassword456!'
     });
     expect(consumeResult.ok).toBe(true);
+    expect(emitted.some((e) => e.type === IAM_EVENTS.CREDENTIAL_PASSWORD_CHANGED)).toBe(true);
 
     const loginResult = await login(ctx, { email: 'resetme@test.example', password: 'NewPassword456!' });
     expect(loginResult.ok).toBe(true);
   });
 
   it('consuming the same token twice returns reset_token_consumed', async () => {
-    await seedUser(iamClient.db, 'doubleconsume@test.example', 'Pass123!');
+    const { userId } = await seedUser(iamClient.db, 'doubleconsume@test.example', 'Pass123!');
+    await seedMembership(iamClient.db, userId);
     const { ctx } = makeIamCtx(iamClient.db);
 
     const reqResult = await requestPasswordReset(ctx, { email: 'doubleconsume@test.example' });

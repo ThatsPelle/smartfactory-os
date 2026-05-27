@@ -17,11 +17,15 @@ export const requestPasswordReset = async (
 ): Promise<Result<{ token: string } | null, IamError>> => {
   const { systemDb, events, correlationId, companyId } = ctx;
 
+  // Single JOIN ensures user exists AND is a member of this company.
+  // Returns Ok(null) for unknown email OR non-member — no user enumeration.
   const userRows = await systemDb.execute(
-    sql`SELECT id FROM core.users WHERE lower(email) = ${input.email} LIMIT 1`
+    sql`SELECT u.id FROM core.users u
+        JOIN core.memberships m ON m.user_id = u.id AND m.company_id = ${companyId as string}::uuid
+        WHERE lower(u.email) = ${input.email.toLowerCase()}
+        LIMIT 1`
   ) as Array<{ id: string }>;
 
-  // No user enumeration — return Ok(null) for unknown email, same shape as success.
   if (!userRows[0]) return Ok(null);
   const userId = userRows[0].id;
 
@@ -60,13 +64,15 @@ export const consumePasswordReset = async (
       WHERE token_hash = ${tokenHash}
       LIMIT 1
       FOR UPDATE
-    `) as Array<{ id: string; user_id: string; consumed_at: Date | null; expires_at: Date }>;
+    `) as Array<{ id: string; user_id: string; consumed_at: unknown; expires_at: unknown }>;
 
     if (!rows[0]) return Err<IamError>({ code: 'reset_token_invalid' });
     const row = rows[0];
 
-    if (row.consumed_at !== null) return Err<IamError>({ code: 'reset_token_consumed' });
-    if (row.expires_at <= new Date())  return Err<IamError>({ code: 'reset_token_expired' });
+    if (row.consumed_at != null) return Err<IamError>({ code: 'reset_token_consumed' });
+    if (new Date(row.expires_at as string).getTime() <= Date.now()) {
+      return Err<IamError>({ code: 'reset_token_expired' });
+    }
 
     await tx.execute(sql`
       UPDATE module_iam.password_reset_tokens
@@ -75,16 +81,19 @@ export const consumePasswordReset = async (
     `);
 
     const newHash = await hashPassword(input.newPassword);
-    await tx.update(credentials)
+    const credRows = await tx.update(credentials)
       .set({
         passwordHash: newHash,
         lastPasswordChangedAt: new Date(),
         failedAttempts: 0,
         lockedUntil: null
       })
-      .where(eq(credentials.userId, row.user_id));
+      .where(eq(credentials.userId, row.user_id as string))
+      .returning({ userId: credentials.userId });
 
-    return Ok(row.user_id);
+    if (!credRows[0]) return Err<IamError>({ code: 'reset_token_invalid' });
+
+    return Ok(row.user_id as string);
   });
 
   if (!result.ok) return Err(result.error);

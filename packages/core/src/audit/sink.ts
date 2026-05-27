@@ -77,7 +77,10 @@ export class AuditSink {
     envelope: EventEnvelope,
     overrides: Partial<AuditWrite> & Pick<AuditWrite, 'moduleId' | 'entityKind' | 'entityId'>
   ): Promise<void> {
-    await this.write({
+    // With exactOptionalPropertyTypes the AuditWrite optionals do not accept
+    // `undefined` — they must be omitted entirely. Build the object
+    // conditionally so the shape matches.
+    const write: AuditWrite = {
       companyId: envelope.company_id,
       actorKind: envelope.emitted_by.kind,
       actorId: envelope.emitted_by.id,
@@ -88,8 +91,11 @@ export class AuditSink {
       changes: overrides.changes ?? null,
       metadata: { ...(overrides.metadata ?? {}), envelope_id: envelope.id },
       correlationId: envelope.correlation_id,
-      causationId: envelope.causation_id ?? undefined,
       occurredAt: new Date(envelope.occurred_at)
-    });
+    };
+    if (envelope.causation_id !== null) {
+      (write as { causationId: string }).causationId = envelope.causation_id;
+    }
+    await this.write(write);
   }
 }

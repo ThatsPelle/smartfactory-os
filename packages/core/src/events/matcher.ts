@@ -27,7 +27,8 @@ const matchSegments = (
   ti: number
 ): boolean => {
   while (pi < p.length && ti < t.length) {
-    const pp = p[pi]!;
+    const pp = p[pi];
+    if (pp === undefined) return false;
     if (pp === '**') {
       // `**` must consume at least one segment and may consume any number.
       // Try every split point.

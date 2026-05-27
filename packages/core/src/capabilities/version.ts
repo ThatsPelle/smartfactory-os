@@ -21,12 +21,14 @@ export interface ParsedCapabilityKey {
 
 export const parseCapabilityKey = (key: string): ParsedCapabilityKey => {
   const m = CAPABILITY_KEY_PATTERN.exec(key);
-  if (!m?.groups) {
+  const name = m?.groups?.['name'];
+  const major = m?.groups?.['major'];
+  if (name === undefined || major === undefined) {
     throw new Error(
       `Invalid capability key "${key}". Expected "<name>@<major>", e.g. "core.event_bus@1".`
     );
   }
-  return { name: m.groups['name']!, major: Number(m.groups['major']), full: key };
+  return { name, major: Number(major), full: key };
 };
 
 /** A capability requirement: capability name+major plus a semver range on the provider's package version. */

@@ -1,0 +1,82 @@
+{
+  "planPath": "docs/superpowers/plans/2026-05-26-module-iam-implementation.md",
+  "tasks": [
+    {
+      "id": 1,
+      "subject": "Task 1: Module Scaffold",
+      "status": "completed",
+      "description": "**Goal:** Create the module package with working build, typecheck, lint, and test runner.\n\n**Files:** modules/module-iam/package.json, tsconfig.json, vitest.config.ts, eslint.config.js, src/ui/placeholder.ts\n\n**Acceptance Criteria:**\n- pnpm --filter @sfos/iam typecheck exits 0\n- pnpm --filter @sfos/iam test exits 0\n\n**Verify:** `pnpm --filter @sfos/iam typecheck && pnpm --filter @sfos/iam test`\n\n```json:metadata\n{\"files\":[\"modules/module-iam/package.json\"],\"verifyCommand\":\"pnpm --filter @sfos/iam typecheck && pnpm --filter @sfos/iam test\",\"acceptanceCriteria\":[\"typecheck exits 0\",\"test exits 0\"]}\n```"
+    },
+    {
+      "id": 2,
+      "subject": "Task 2: SQL Migrations",
+      "status": "completed",
+      "blockedBy": [1],
+      "description": "**Goal:** Three migration files for module_iam schema, tables, and RLS.\n\n**Files:** 0001_iam_schema.sql, 0002_iam_tables.sql, 0003_iam_rls.sql\n\n**Acceptance Criteria:**\n- All three apply cleanly after packages/db migrations 0000-0003\n- RLS FORCE-enabled on all four tables\n\n**Verify:** `psql $DATABASE_ADMIN_URL -f 0001 -f 0002 -f 0003`\n\n```json:metadata\n{\"files\":[\"modules/module-iam/src/migrations/0001_iam_schema.sql\"],\"verifyCommand\":\"psql $DATABASE_ADMIN_URL -f modules/module-iam/src/migrations/0001_iam_schema.sql\",\"acceptanceCriteria\":[\"All three migrations apply without errors\"]}\n```"
+    },
+    {
+      "id": 3,
+      "subject": "Task 3: Drizzle Schema + DB Client",
+      "status": "completed",
+      "blockedBy": [1],
+      "description": "**Goal:** TypeScript Drizzle schema + IamDb factory.\n\n**Files:** src/server/db/schema.ts, src/server/db/client.ts\n\n**Acceptance Criteria:**\n- typecheck exits 0\n- IamDb exported, createIamDb factory present\n\n**Verify:** `pnpm --filter @sfos/iam typecheck`\n\n```json:metadata\n{\"files\":[\"modules/module-iam/src/server/db/schema.ts\",\"modules/module-iam/src/server/db/client.ts\"],\"verifyCommand\":\"pnpm --filter @sfos/iam typecheck\",\"acceptanceCriteria\":[\"typecheck exits 0\"]}\n```"
+    },
+    {
+      "id": 4,
+      "subject": "Task 4: Internal Helpers + Unit Tests",
+      "status": "completed",
+      "blockedBy": [1],
+      "description": "**Goal:** password-hash, session-token, crypto-compare, lockout + unit tests. No DB required.\n\n**Files:** src/internal/*.ts, tests/credentials.test.ts, tests/sessions.test.ts (token unit tests)\n\n**Acceptance Criteria:**\n- All unit tests pass without TEST_DATABASE_URL\n- hashPassword uses argon2id\n- Lockout engages after threshold\n\n**Verify:** `pnpm --filter @sfos/iam test -- --reporter=verbose`\n\n```json:metadata\n{\"files\":[\"modules/module-iam/src/internal/password-hash.ts\"],\"verifyCommand\":\"pnpm --filter @sfos/iam test -- --reporter=verbose\",\"acceptanceCriteria\":[\"All unit tests pass\",\"hashPassword uses argon2id\",\"lockout engages after threshold\"]}\n```"
+    },
+    {
+      "id": 5,
+      "subject": "Task 5: Contracts (Zod schemas + types)",
+      "status": "completed",
+      "blockedBy": [1],
+      "description": "**Goal:** Zod schemas + types for all IAM I/O. SessionPublicView and SessionInternalView separated.\n\n**Files:** src/contracts/login.ts, session.ts, invite.ts, password.ts, index.ts\n\n**Acceptance Criteria:**\n- typecheck exits 0\n- SessionPublicView has no token/IP/revocation fields\n\n**Verify:** `pnpm --filter @sfos/iam typecheck`\n\n```json:metadata\n{\"files\":[\"modules/module-iam/src/contracts/session.ts\"],\"verifyCommand\":\"pnpm --filter @sfos/iam typecheck\",\"acceptanceCriteria\":[\"typecheck exits 0\",\"SessionPublicView safe\"]}\n```"
+    },
+    {
+      "id": 6,
+      "subject": "Task 6: Server Foundation",
+      "status": "completed",
+      "blockedBy": [3, 4, 5],
+      "description": "**Goal:** constants, errors, context (IamServiceCtx), permissions, events (buildIamEnvelope).\n\n**Files:** src/server/constants.ts, errors.ts, context.ts, permissions.ts, events.ts\n\n**Acceptance Criteria:**\n- typecheck exits 0\n- IamError is discriminated union (no message field)\n- IamServiceCtx has systemDb: IamDb and tenantDb: SfosDb\n\n**Verify:** `pnpm --filter @sfos/iam typecheck`\n\n```json:metadata\n{\"files\":[\"modules/module-iam/src/server/context.ts\"],\"verifyCommand\":\"pnpm --filter @sfos/iam typecheck\",\"acceptanceCriteria\":[\"typecheck exits 0\",\"IamError discriminated union\"]}\n```"
+    },
+    {
+      "id": 7,
+      "subject": "Task 7: Auth Service",
+      "status": "completed",
+      "blockedBy": [6],
+      "description": "**Goal:** login, logout, validateSession with lockout enforcement, event emission, integration tests.\n\n**Files:** src/server/api/auth.ts, tests/helpers.ts, tests/sessions.test.ts (integration)\n\n**Acceptance Criteria:**\n- login valid creds → tokens\n- login wrong pw → invalid_credentials\n- 5 failures → account_locked\n- validateSession expired/revoked/unknown → correct errors\n\n**Verify:** `pnpm --filter @sfos/iam test tests/sessions.test.ts`\n\n```json:metadata\n{\"files\":[\"modules/module-iam/src/server/api/auth.ts\"],\"verifyCommand\":\"pnpm --filter @sfos/iam test tests/sessions.test.ts\",\"acceptanceCriteria\":[\"login returns tokens\",\"lockout after 5 failures\",\"validateSession works\"]}\n```"
+    },
+    {
+      "id": 8,
+      "subject": "Task 8: Invitations Service",
+      "status": "completed",
+      "blockedBy": [6],
+      "description": "**Goal:** createInvitation, acceptInvitation (atomic+transactional), revokeInvitation.\n\n**Files:** src/server/api/invitations.ts, tests/invitations.test.ts\n\n**Acceptance Criteria:**\n- Token stored as hash only\n- acceptInvitation atomic via UPDATE…WHERE status='pending' RETURNING\n- membership created via withTenantContext on tenantDb\n- double-accept → invitation_already_accepted\n\n**Verify:** `pnpm --filter @sfos/iam test tests/invitations.test.ts`\n\n```json:metadata\n{\"files\":[\"modules/module-iam/src/server/api/invitations.ts\"],\"verifyCommand\":\"pnpm --filter @sfos/iam test tests/invitations.test.ts\",\"acceptanceCriteria\":[\"atomic consume\",\"membership via tenantDb\",\"double-accept rejected\"]}\n```"
+    },
+    {
+      "id": 9,
+      "subject": "Task 9: Sessions + Password Reset Services",
+      "status": "completed",
+      "blockedBy": [6],
+      "description": "**Goal:** listSessions, revokeSession, revokeAllSessions, requestPasswordReset, consumePasswordReset.\n\n**Files:** src/server/api/sessions.ts, src/server/api/password.ts, tests/password-reset.test.ts\n\n**Acceptance Criteria:**\n- requestPasswordReset Ok(null) for unknown email\n- consumePasswordReset SELECT FOR UPDATE atomic\n- double-consume → reset_token_consumed\n\n**Verify:** `pnpm --filter @sfos/iam test tests/password-reset.test.ts`\n\n```json:metadata\n{\"files\":[\"modules/module-iam/src/server/api/password.ts\"],\"verifyCommand\":\"pnpm --filter @sfos/iam test tests/password-reset.test.ts\",\"acceptanceCriteria\":[\"no user enumeration\",\"atomic consume\",\"double-consume rejected\"]}\n```"
+    },
+    {
+      "id": 10,
+      "subject": "Task 10: Module Lifecycle + Manifest + Barrel + Docs",
+      "status": "completed",
+      "blockedBy": [7, 8, 9],
+      "description": "**Goal:** ModuleLifecycle, manifest.ts, src/index.ts barrel, MODULE.md, OWNERSHIP.md.\n\n**Files:** src/server/index.ts, src/index.ts, manifest.ts, MODULE.md, OWNERSHIP.md\n\n**Acceptance Criteria:**\n- typecheck + test both exit 0\n- src/index.ts has no internal/ exports\n- manifest validates against ManifestSchema\n- preFlight returns Err when DATABASE_IAM_URL unset\n\n**Verify:** `pnpm --filter @sfos/iam typecheck && pnpm --filter @sfos/iam test`\n\n```json:metadata\n{\"files\":[\"modules/module-iam/src/index.ts\",\"modules/module-iam/manifest.ts\"],\"verifyCommand\":\"pnpm --filter @sfos/iam typecheck && pnpm --filter @sfos/iam test\",\"acceptanceCriteria\":[\"typecheck exits 0\",\"test exits 0\",\"no internal exports\"]}\n```"
+    },
+    {
+      "id": 11,
+      "subject": "Task 11: Adversarial Tests (MANDATORY)",
+      "status": "completed",
+      "blockedBy": [7, 8, 9],
+      "description": "**Goal:** Security tests — no user enumeration, brute-force lockout, cross-tenant bleed, race condition on invite accept, single-use token enforcement.\n\n**Files:** tests/adversarial.test.ts\n\n**Acceptance Criteria:**\n- AUTH-1: unknown email = same error as wrong password\n- AUTH-2: 5 failures → account_locked\n- SESSION-1: revoked token → session_revoked\n- INVITE-1: concurrent accept — exactly 1 wins\n- RESET-1: double-consume → reset_token_consumed\n\n**Verify:** `TEST_DATABASE_URL=$TEST_DATABASE_URL pnpm --filter @sfos/iam test tests/adversarial.test.ts -- --reporter=verbose`\n\n```json:metadata\n{\"files\":[\"modules/module-iam/tests/adversarial.test.ts\"],\"verifyCommand\":\"TEST_DATABASE_URL=$TEST_DATABASE_URL pnpm --filter @sfos/iam test tests/adversarial.test.ts -- --reporter=verbose\",\"acceptanceCriteria\":[\"No user enumeration\",\"Brute-force lockout\",\"Revoked session denied\",\"Race condition handled\",\"Double-consume denied\"]}\n```"
+    }
+  ],
+  "lastUpdated": "2026-05-27T03:27:00Z"
+}

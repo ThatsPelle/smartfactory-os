@@ -1,4 +1,4 @@
-export { matches } from './matcher.js';
+export { matches, matches as eventTypeMatches } from './matcher.js';
 export {
   EventBus,
   type DispatchResult,

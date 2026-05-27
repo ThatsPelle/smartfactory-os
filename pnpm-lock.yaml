@@ -56,6 +56,9 @@ importers:
       drizzle-orm:
         specifier: ^0.36.0
         version: 0.36.4(postgres@3.4.9)
+      postgres:
+        specifier: ^3.4.4
+        version: 3.4.9
       ulid:
         specifier: ^2.3.0
         version: 2.4.0
@@ -72,9 +75,6 @@ importers:
       '@types/node':
         specifier: ^20.16.10
         version: 20.19.41
-      postgres:
-        specifier: ^3.4.4
-        version: 3.4.9
       rimraf:
         specifier: ^6.0.1
         version: 6.1.3

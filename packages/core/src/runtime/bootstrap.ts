@@ -1,4 +1,5 @@
-import type { RegisteredModule, PlatformContext, ModuleLogger } from '@sfos/module-sdk';
+import { asCompanyId } from '@sfos/contracts';
+import type { RegisteredModule, PlatformContext, ModuleLogger, TenantContext } from '@sfos/module-sdk';
 
 import { resolveCapabilities } from '../capabilities/graph.js';
 import { EventBus } from '../events/bus.js';
@@ -80,7 +81,6 @@ export const bootstrap = async (input: BootstrapInput): Promise<BootstrapResult>
     new Map();
   let providersByModule: ReadonlyMap<string, readonly string[]> = new Map();
   let cycles: readonly (readonly string[])[] = [];
-  let initialized: readonly RegisteredModule[] = [];
 
   const loadOpts: LoadOptions = {
     platformVersion: input.platformVersion,
@@ -125,7 +125,6 @@ export const bootstrap = async (input: BootstrapInput): Promise<BootstrapResult>
     for (const m of stillValid) registry.register(m);
     registry.setOrder(resolution.order);
     for (const m of stillValid) engine.transition(m.manifest.identity.id, 'registered');
-    initialized = stillValid;
   });
 
   // ---------- Phase 3+4: initialize ----------
@@ -138,23 +137,42 @@ export const bootstrap = async (input: BootstrapInput): Promise<BootstrapResult>
         moduleId: id,
         settings: input.settings ?? noopSettings,
         events: {
+          // Subscription wrapper: the module-sdk surface takes
+          // `(event, ctx)`, but the platform's bus only knows envelopes.
+          // We bridge by building a minimal tenant context per dispatch
+          // from the envelope itself.
+          //
+          // Two intentional limitations of this foundation:
+          //   - Events with `company_id === null` (platform-system events)
+          //     are skipped. They need a system-context dispatch path,
+          //     which is a deferred concern (see docs/runtime-architecture.md).
+          //   - `actorUserId` is not populated. The envelope's `emitted_by`
+          //     may or may not be a user; resolving that to a branded
+          //     UserId belongs to the future tenant-aware request layer,
+          //     not this foundation.
+          //
+          // Handlers that need user attribution should read `event.emitted_by`
+          // directly until that layer ships.
           subscribe: (pattern, handler) => {
-            bus.subscribe(id, pattern, (event) => handler(event, {
-              companyId: event.company_id as never,
-              actorUserId: undefined,
-              logger,
-              moduleId: id,
-              events: {
-                emit: async (env) => {
-                  if (env.source_module !== id) {
-                    throw new ForeignEmissionError(id, env.source_module, env.type);
+            bus.subscribe(id, pattern, async (event) => {
+              if (event.company_id === null) return;
+              const tenantCtx: TenantContext = {
+                companyId: asCompanyId(event.company_id),
+                logger,
+                moduleId: id,
+                events: {
+                  emit: async (env) => {
+                    if (env.source_module !== id) {
+                      throw new ForeignEmissionError(id, env.source_module, env.type);
+                    }
+                    // Cross-handler emit at this layer is intentionally not
+                    // implemented yet — the outbox is the canonical path. A
+                    // handler that needs to emit publishes to the outbox.
                   }
-                  // Cross-handler emit at this layer is intentionally not
-                  // implemented yet — the outbox is the canonical path. A
-                  // handler that needs to emit publishes to the outbox.
                 }
-              }
-            }));
+              };
+              await handler(event, tenantCtx);
+            });
           }
         }
       };
@@ -185,10 +203,12 @@ export const bootstrap = async (input: BootstrapInput): Promise<BootstrapResult>
       }
     }
   });
-  void initialized;
 
   // ---------- Phase 5: snapshot ----------
   const modules: ModuleDiagnostic[] = [];
+  const seen = new Set<string>();
+
+  // 1. Registered + initialized (or failed during init) — registry order.
   for (const m of registry.list()) {
     const id = m.manifest.identity.id;
     modules.push({
@@ -198,9 +218,29 @@ export const bootstrap = async (input: BootstrapInput): Promise<BootstrapResult>
       unresolved: unresolvedByModule.get(id) ?? [],
       providers: providersByModule.get(id) ?? []
     });
+    seen.add(id);
   }
-  // Include load-failed modules that never made it into the registry, so
-  // diagnostics surface them too.
+
+  // 2. Modules that loaded and entered the lifecycle engine but were
+  //    failed BEFORE registration (unresolved deps, cycle members).
+  //    These never reach registry.list(); we surface them from the engine
+  //    snapshot so diagnostics never lie about which modules failed.
+  for (const m of valid) {
+    const id = m.manifest.identity.id;
+    if (seen.has(id)) continue;
+    modules.push({
+      moduleId: id,
+      version: m.manifest.identity.version,
+      state: engine.stateOf(id) ?? 'failed',
+      unresolved: unresolvedByModule.get(id) ?? [],
+      providers: providersByModule.get(id) ?? []
+    });
+    seen.add(id);
+  }
+
+  // 3. Modules that never even loaded (schema invalid, duplicate id,
+  //    platform/runtime mismatch). Report whatever id we managed to read
+  //    from the load issue.
   for (const issue of loadIssues) {
     if (issue.moduleId && !modules.some((m) => m.moduleId === issue.moduleId)) {
       modules.push({

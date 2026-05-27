@@ -99,9 +99,12 @@ describe('bootstrap (end-to-end runtime startup)', () => {
   it('records every lifecycle transition in history', async () => {
     const r = await bootstrap({
       ...opts,
-      modules: [{ manifest: fakeManifest({ id: 'h' }), lifecycle: recordingLifecycle() }]
+      modules: [{ manifest: fakeManifest({ id: 'history.test' }), lifecycle: recordingLifecycle() }]
     });
-    const transitions = r.engine.history().filter((h) => h.moduleId === 'h').map((h) => h.to);
+    const transitions = r.engine
+      .history()
+      .filter((h) => h.moduleId === 'history.test')
+      .map((h) => h.to);
     expect(transitions).toEqual(['discovered', 'validated', 'registered', 'initialized']);
   });
 

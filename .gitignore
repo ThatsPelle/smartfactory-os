@@ -41,3 +41,8 @@ temp/
 manifest.json
 docs/events.generated.md
 docs/manifests/generated/
+
+# Local AI/tooling state
+.claude/settings.local.json
+.claude/worktrees/
+graphify-out/
