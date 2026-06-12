@@ -11,20 +11,20 @@ workstation deployment.
 
 ## Repository Map
 
-| Path                                | Current role                                                                                                      |
-| ----------------------------------- | ----------------------------------------------------------------------------------------------------------------- |
-| `apps/`                             | Runtime host workspace. Only `runtime-host` exists; BFF/web/worker and workspace engine are not implemented.      |
-| `apps/runtime-host/`                | Minimal composition host: bootstrap core + modules, then optionally hydrate company activation mirrors.           |
-| `packages/contracts/`               | Frozen types and schemas: brands, result, manifest, event envelope, platform keys.                                |
-| `packages/events/`                  | Event construction, ownership naming checks, ULID helpers.                                                        |
-| `packages/module-sdk/`              | Public module lifecycle, contexts, manifest helper, registry interfaces.                                          |
-| `packages/db/`                      | Core PostgreSQL schema, RLS helpers, audit/outbox persistence, tenant context.                                    |
-| `packages/core/`                    | Bootstrap orchestration, manifest loading, capability graph, registry, lifecycle, event bus, outbox, diagnostics. |
-| `modules/module-iam/`               | First operational module: credentials, sessions, invitations, password reset.                                     |
-| `tools/generators/module-template/` | Canonical module skeleton. Generator command is not implemented.                                                  |
-| `docs/adr/`                         | Accepted structural decisions. Append-only.                                                                       |
-| `docs/architecture/`                | Eight canonical architecture documents: blueprint through bootstrap plan.                                         |
-| `graphify-out/`                     | Local generated knowledge graph. Ignored by Git.                                                                  |
+| Path                                | Current role                                                                                                                          |
+| ----------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
+| `apps/`                             | Runtime host workspace. Only `runtime-host` exists; BFF/web/worker and workspace engine are not implemented.                          |
+| `apps/runtime-host/`                | Minimal composition host and CLI: bootstrap core + modules, optionally hydrate company activation mirrors, print startup diagnostics. |
+| `packages/contracts/`               | Frozen types and schemas: brands, result, manifest, event envelope, platform keys.                                                    |
+| `packages/events/`                  | Event construction, ownership naming checks, ULID helpers.                                                                            |
+| `packages/module-sdk/`              | Public module lifecycle, contexts, manifest helper, registry interfaces.                                                              |
+| `packages/db/`                      | Core PostgreSQL schema, RLS helpers, audit/outbox persistence, tenant context.                                                        |
+| `packages/core/`                    | Bootstrap orchestration, manifest loading, capability graph, registry, lifecycle, event bus, outbox, diagnostics.                     |
+| `modules/module-iam/`               | First operational module: credentials, sessions, invitations, password reset.                                                         |
+| `tools/generators/module-template/` | Canonical module skeleton. Generator command is not implemented.                                                                      |
+| `docs/adr/`                         | Accepted structural decisions. Append-only.                                                                                           |
+| `docs/architecture/`                | Eight canonical architecture documents: blueprint through bootstrap plan.                                                             |
+| `graphify-out/`                     | Local generated knowledge graph. Ignored by Git.                                                                                      |
 
 ## Package Graph
 
@@ -106,6 +106,8 @@ Forbidden directions:
   truth after restart.
 - Minimal runtime host composition plus explicit company enumeration for
   bootstrap-time hydration.
+- Thin runtime-host CLI/process entrypoint with explicit hydration flags,
+  diagnostics formatting, and exit-code control.
 
 ## IAM Status
 
@@ -141,6 +143,9 @@ pnpm typecheck
 pnpm build
 pnpm validate:deps
 pnpm validate
+pnpm --filter @sfos/runtime-host build
+pnpm --filter @sfos/runtime-host start -- --help
+pnpm --filter @sfos/runtime-host test
 pnpm --filter @sfos/core test
 pnpm --filter @sfos/iam test
 pnpm db:migrate
@@ -162,8 +167,8 @@ TEST_DATABASE_URL=postgres://... pnpm --filter @sfos/iam test
   planner preserves that historical order. New duplicate sequences fail.
 - Migration ownership validation is text-based; dynamic SQL and grants still
   require review.
-- `apps/runtime-host` is composition-only. No HTTP host, CLI entrypoint, or
-  workspace engine exists yet.
+- `apps/runtime-host` is still process-only. No HTTP host or workspace engine
+  exists yet.
 - Startup hydration enumerates companies with system context and mirrors
   persisted active rows, but it still does not reconcile missing modules or
   repair invalid activation state.
@@ -192,5 +197,5 @@ TEST_DATABASE_URL=postgres://... pnpm --filter @sfos/iam test
 
 ## Next Recommended Task
 
-Add the first thin host entrypoint or runner around `apps/runtime-host`
+Add explicit shutdown and outbox-publisher lifecycle around `apps/runtime-host`
 without starting the workspace engine or adding app-level business logic.

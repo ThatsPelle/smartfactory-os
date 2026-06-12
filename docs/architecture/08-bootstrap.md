@@ -15,7 +15,8 @@ The foundation is built in dependency order:
 
 Steps 1-6 exist. Step 7 is the current foundation enforcement stage. Runtime
 features start only after it passes. A minimal runtime host now exists under
-`apps/runtime-host`; workspace/warehouse execution remains deferred.
+`apps/runtime-host`; it now includes a thin CLI/process entrypoint for
+bootstrap and diagnostics. Workspace/warehouse execution remains deferred.
 
 ## Runtime Bootstrap
 
@@ -65,6 +66,19 @@ read failure degrades only that company and clears only that company mirror.
 Automatic bootstrap activation and workspace integration remain unimplemented.
 Bootstrap still does not silently mutate activation state.
 
+## Runtime Host CLI
+
+`apps/runtime-host` now exposes first thin process wrapper around
+`composeRuntime()`:
+
+- default run: bootstrap only
+- `--hydrate`: explicit company enumeration + hydration
+- `--json` / `--pretty`: deterministic diagnostics output
+- `--fail-on-degraded`: operator-controlled non-zero exit on degraded state
+
+The CLI reports diagnostics only. It does not auto-activate modules, repair
+invalid activation state, start HTTP, start UI, or start workspace engine.
+
 ## Current Foundation Gates
 
 - Formatting, lint, typecheck, build.
@@ -82,8 +96,8 @@ DB-backed tests that skip without `TEST_DATABASE_URL` are not full validation.
 After all gates pass on a clean Linux CI checkout:
 
 1. Close remaining documented enforcement warnings.
-2. Add the first real host wrapper or CLI entrypoint around
-   `apps/runtime-host`.
+2. Add explicit shutdown/outbox-process lifecycle around runtime host
+   without adding product behavior.
 3. Design workspace engine through an ADR/plan before implementation.
 
 Do not start UI or operational feature breadth during bootstrap work.

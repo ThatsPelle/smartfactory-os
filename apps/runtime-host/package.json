@@ -7,6 +7,9 @@
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
+  "bin": {
+    "sfos-runtime-host": "./dist/cli.js"
+  },
   "files": [
     "dist",
     "src"
@@ -16,13 +19,16 @@
     "typecheck": "tsc --noEmit",
     "lint": "eslint src tests",
     "clean": "rimraf dist .turbo",
+    "start": "node ./dist/cli.js",
+    "cli": "node ./dist/cli.js",
     "test": "vitest run",
     "test:watch": "vitest"
   },
   "dependencies": {
     "@sfos/core": "workspace:*",
     "@sfos/db": "workspace:*",
-    "@sfos/iam": "workspace:*"
+    "@sfos/iam": "workspace:*",
+    "@sfos/module-sdk": "workspace:*"
   },
   "devDependencies": {
     "@sfos/eslint-config": "workspace:*",
