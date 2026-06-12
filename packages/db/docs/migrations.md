@@ -14,6 +14,16 @@ The runner (`scripts/migrate.ts`) connects with `DATABASE_ADMIN_URL`,
 records applied migrations in `app.drizzle_migrations`, and refuses to
 proceed if a previously-applied file's content hash has changed.
 
+CI applies core migrations, then IAM migrations through the same runner and
+ledger:
+
+```bash
+pnpm db:migrate:test
+```
+
+Module migration ledger names are path-namespaced, such as
+`module-iam/0001_iam_schema.sql`. Existing core ledger names remain unchanged.
+
 ## Adding a migration
 
 1. Decide the **scope**: platform-core (this package) or module-owned.
@@ -69,9 +79,9 @@ packages/db/drizzle/0043_core_add_billing_email.sql
 modules/wms/db/migrations/0044_wms_init_stock_items.sql
 ```
 
-A future tool collects all migration files across the workspace and feeds
-them to the runner in sequence. Until that tool exists, modules are not
-yet shipped, and `packages/db/drizzle/` is the only source.
+General workspace-wide migration discovery remains future work. CI explicitly
+invokes the existing runner for IAM after core migrations. Other module
+directories are not auto-discovered.
 
 A module migration MUST NOT touch `core.*` or another module's schema.
 `dependency-cruiser` enforces this at the code level; the migration runner

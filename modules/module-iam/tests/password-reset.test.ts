@@ -2,7 +2,7 @@ import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 import { createIamDb } from '../src/server/db/client.js';
 import { requestPasswordReset, consumePasswordReset } from '../src/server/api/password.js';
 import { login } from '../src/server/api/auth.js';
-import { makeIamCtx, seedUser, seedMembership, cleanup } from './helpers.js';
+import { cleanup, ensureTestCompany, makeIamCtx, seedMembership, seedUser } from './helpers.js';
 import { IAM_EVENTS } from '../src/server/events.js';
 
 const DB_URL = process.env['TEST_DATABASE_URL'];
@@ -12,6 +12,7 @@ describe.skipIf(!DB_URL)('password reset — integration', () => {
 
   beforeAll(async () => {
     iamClient = createIamDb(DB_URL!);
+    await ensureTestCompany(iamClient.db);
   });
   afterAll(async () => {
     await cleanup(iamClient.db);

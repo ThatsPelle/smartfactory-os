@@ -104,7 +104,8 @@ Forbidden directions:
 `DATABASE_IAM_URL`.
 
 Unit tests run without PostgreSQL. Integration and adversarial tests require
-`TEST_DATABASE_URL`; otherwise Vitest reports explicit skips.
+`TEST_DATABASE_URL`; otherwise Vitest reports explicit skips. GitHub Actions
+provides PostgreSQL 16 and runs core plus IAM migrations before tests.
 
 ## Validation Pipeline
 
@@ -131,6 +132,8 @@ pnpm validate:deps
 pnpm validate
 pnpm --filter @sfos/core test
 pnpm --filter @sfos/iam test
+pnpm db:migrate:test
+pnpm test:ci
 ```
 
 For full DB coverage:
@@ -142,11 +145,11 @@ TEST_DATABASE_URL=postgres://... pnpm --filter @sfos/iam test
 
 ## Current Issues
 
-- CI test jobs without PostgreSQL and `TEST_DATABASE_URL` skip DB-backed
-  core/IAM tests. Do not report those runs as full database validation.
 - `validate:deps` reports `modules/module-iam/src/ui/placeholder.ts` as an
   orphan warning.
-- Module migration aggregation and tenant activation wiring remain deferred.
+- General module migration aggregation and tenant activation wiring remain
+  deferred. CI currently applies core and IAM migrations explicitly through
+  the shared migration ledger.
 - The ESLint source resolver fix for clean Linux checkouts needs confirmation
   from the next GitHub Actions run.
 
@@ -174,6 +177,5 @@ TEST_DATABASE_URL=postgres://... pnpm --filter @sfos/iam test
 
 ## Next Recommended Task
 
-Add PostgreSQL-backed CI coverage for core and IAM using an ephemeral database,
-then implement module migration aggregation and tenant activation wiring. Do
-not start the workspace engine before those foundation paths are enforced.
+Implement general module migration aggregation and tenant activation wiring.
+Do not start the workspace engine before those foundation paths are enforced.

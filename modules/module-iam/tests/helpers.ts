@@ -6,6 +6,14 @@ import { hashPassword } from '../src/internal/password-hash.js';
 
 export const TEST_COMPANY_ID = '00000000-0000-4000-a000-000000000001';
 
+export const ensureTestCompany = async (db: IamDb): Promise<void> => {
+  await db.execute(
+    sql`INSERT INTO core.companies (id, name, slug)
+        VALUES (${TEST_COMPANY_ID}::uuid, 'IAM Test Company', 'iam-test-company')
+        ON CONFLICT (id) DO NOTHING`
+  );
+};
+
 export const makeRecordingEvents = () => {
   const emitted: EventEnvelope[] = [];
   return {

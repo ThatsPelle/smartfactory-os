@@ -55,8 +55,8 @@ const insertOutbox = async (
     INSERT INTO core.outbox_events
       (id, company_id, type, version, source_module, correlation_id, envelope, occurred_at)
     VALUES
-      (${id}, ${companyId}, ${type}, '1.0', 'test', ${id},
-       ${admin.sql.json(buildEnvelope(id, companyId, type))}::jsonb,
+       (${id}, ${companyId}, ${type}, '1.0', 'test', ${id},
+       ${JSON.stringify(buildEnvelope(id, companyId, type))}::jsonb,
        now())
   `;
 };
@@ -67,19 +67,20 @@ suite('outbox publisher', () => {
 
   beforeAll(async () => {
     admin = createAdminClient(adminUrl!);
-    // Ensure the schema is migrated. Tests assume the operator ran
-    // `pnpm --filter @sfos/db db:migrate` first.
+    const slug = `outbox-test-${Math.random().toString(36).slice(2, 8)}`;
     const [c] = await admin.sql<{ id: string }[]>`
-      INSERT INTO core.companies (name, slug) VALUES ('outbox-test', 'outbox-test-${Math.random().toString(36).slice(2, 8)}')
+      INSERT INTO core.companies (name, slug) VALUES ('outbox-test', ${slug})
       RETURNING id
     `;
     companyId = c!.id;
   });
 
   afterAll(async () => {
-    await admin.sql`DELETE FROM core.outbox_events WHERE company_id = ${companyId}`;
-    await admin.sql`DELETE FROM core.companies WHERE id = ${companyId}`;
-    await admin.close();
+    if (admin && companyId) {
+      await admin.sql`DELETE FROM core.outbox_events WHERE company_id = ${companyId}`;
+      await admin.sql`DELETE FROM core.companies WHERE id = ${companyId}`;
+      await admin.close();
+    }
   });
 
   beforeEach(async () => {

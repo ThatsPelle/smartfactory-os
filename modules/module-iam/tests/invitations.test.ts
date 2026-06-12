@@ -5,7 +5,7 @@ import {
   acceptInvitation,
   revokeInvitation
 } from '../src/server/api/invitations.js';
-import { makeIamCtx, seedUser, cleanup } from './helpers.js';
+import { cleanup, ensureTestCompany, makeIamCtx, seedUser } from './helpers.js';
 import type { IamServiceCtx } from '../src/server/context.js';
 
 const DB_URL = process.env['TEST_DATABASE_URL'];
@@ -16,6 +16,7 @@ describe.skipIf(!DB_URL)('invitations service — integration', () => {
 
   beforeAll(async () => {
     iamClient = createIamDb(DB_URL!);
+    await ensureTestCompany(iamClient.db);
     ({ userId: adminUserId } = await seedUser(iamClient.db, 'admin@test.example', 'AdminPass123!'));
   });
 

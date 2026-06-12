@@ -36,7 +36,7 @@ describe('session-token', () => {
 // ============================================================
 import { createIamDb } from '../src/server/db/client.js';
 import { login, logout, validateSession } from '../src/server/api/auth.js';
-import { makeIamCtx, seedUser, cleanup } from './helpers.js';
+import { cleanup, ensureTestCompany, makeIamCtx, seedUser } from './helpers.js';
 import type { IamServiceCtx } from '../src/server/context.js';
 
 const DB_URL = process.env['TEST_DATABASE_URL'];
@@ -46,6 +46,7 @@ describe.skipIf(!DB_URL)('auth service — integration', () => {
 
   beforeAll(async () => {
     iamClient = createIamDb(DB_URL!);
+    await ensureTestCompany(iamClient.db);
   });
 
   afterAll(async () => {

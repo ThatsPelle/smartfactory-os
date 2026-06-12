@@ -13,6 +13,7 @@
   "scripts": {
     "build": "turbo run build",
     "test": "turbo run test && pnpm run test:validators",
+    "test:ci": "turbo run test --concurrency=1 --force && pnpm run test:validators",
     "test:validators": "turbo run build --filter=./modules/* && node --test tools/manifest-validator/index.test.mjs tools/event-catalog/index.test.mjs tools/rls-checker/index.test.mjs",
     "lint": "turbo run lint && eslint tools/manifest-validator tools/event-catalog tools/rls-checker",
     "typecheck": "turbo run typecheck",
@@ -21,6 +22,7 @@
     "validate:manifests": "turbo run build --filter=./modules/* && node tools/manifest-validator/index.mjs",
     "validate:events": "turbo run build --filter=./modules/* && node tools/event-catalog/index.mjs",
     "validate:rls": "node tools/rls-checker/index.mjs",
+    "db:migrate:test": "pnpm --filter @sfos/db db:migrate && pnpm --filter @sfos/db db:migrate:iam",
     "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md,yml,yaml}\"",
     "format:check": "prettier --check \"**/*.{ts,tsx,js,jsx,json,md,yml,yaml}\"",
     "clean": "turbo run clean && rimraf node_modules .turbo"

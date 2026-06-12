@@ -4,7 +4,7 @@ import { createIamDb } from '../src/server/db/client.js';
 import { login, logout, validateSession } from '../src/server/api/auth.js';
 import { createInvitation, acceptInvitation } from '../src/server/api/invitations.js';
 import { requestPasswordReset, consumePasswordReset } from '../src/server/api/password.js';
-import { makeIamCtx, seedUser, seedMembership, cleanup } from './helpers.js';
+import { cleanup, ensureTestCompany, makeIamCtx, seedMembership, seedUser } from './helpers.js';
 
 const DB_URL = process.env['TEST_DATABASE_URL'];
 
@@ -13,6 +13,7 @@ describe.skipIf(!DB_URL)('adversarial security tests', () => {
 
   beforeAll(async () => {
     iamClient = createIamDb(DB_URL!);
+    await ensureTestCompany(iamClient.db);
   });
 
   afterEach(async () => {
