@@ -18,5 +18,15 @@ export {
   ActivationRegistryHydrator,
   type HydrateCompanyActivationsInput,
   type ActivationHydrationDiagnostic,
-  type ActivationHydrationResult
+  type ActivationHydrationResult,
+  type PersistedActivationStateRow
 } from './hydration.js';
+
+export {
+  StartupHydrationOrchestrator,
+  type StartupHydrationCompanyDiagnostic,
+  type StartupHydrationCompanyResult,
+  type StartupHydrationEnumerationError,
+  type StartupHydrationOrchestratorOptions,
+  type StartupHydrationReport
+} from './startup-hydration.js';

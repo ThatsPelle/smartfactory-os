@@ -12,7 +12,7 @@
   "packageManager": "pnpm@9.12.0",
   "scripts": {
     "build": "turbo run build",
-    "test": "turbo run test && pnpm run test:validators",
+    "test": "turbo run test --concurrency=1 && pnpm run test:validators",
     "test:ci": "turbo run test --concurrency=1 --force && pnpm run test:validators",
     "test:validators": "turbo run build --filter=./modules/* && node --test tools/manifest-validator/index.test.mjs tools/event-catalog/index.test.mjs tools/rls-checker/index.test.mjs",
     "lint": "turbo run lint && eslint tools/manifest-validator tools/event-catalog tools/rls-checker",

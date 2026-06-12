@@ -45,6 +45,16 @@ There is intentionally no `createAdminClient` re-exported from the package
 root. Admin reaches modules through a separate subpath (`@sfos/db/client`)
 that future dependency-cruiser rules will deny to module code.
 
+Platform-owned startup helpers are re-exported from the package root for
+composition code:
+
+```ts
+import { listCompaniesForHydration, listCompanyModuleActivationsForHydration } from '@sfos/db';
+```
+
+These helpers are read-only, use the admin/system role internally, and exist
+only for runtime host hydration orchestration.
+
 ## Topics
 
 - [RLS strategy](./docs/rls.md) — what the predicates mean and why

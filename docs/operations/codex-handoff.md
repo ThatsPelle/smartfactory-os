@@ -13,7 +13,8 @@ workstation deployment.
 
 | Path                                | Current role                                                                                                      |
 | ----------------------------------- | ----------------------------------------------------------------------------------------------------------------- |
-| `apps/`                             | Runtime hosts. Empty except `.gitkeep`; BFF/web/worker not implemented.                                           |
+| `apps/`                             | Runtime host workspace. Only `runtime-host` exists; BFF/web/worker and workspace engine are not implemented.      |
+| `apps/runtime-host/`                | Minimal composition host: bootstrap core + modules, then optionally hydrate company activation mirrors.           |
 | `packages/contracts/`               | Frozen types and schemas: brands, result, manifest, event envelope, platform keys.                                |
 | `packages/events/`                  | Event construction, ownership naming checks, ULID helpers.                                                        |
 | `packages/module-sdk/`              | Public module lifecycle, contexts, manifest helper, registry interfaces.                                          |
@@ -35,7 +36,7 @@ graph TD
   db["@sfos/db"]
   core["@sfos/core"]
   iam["@sfos/iam"]
-  runtime["Future runtime app"]
+  runtime["@sfos/runtime-host"]
 
   events --> contracts
   sdk --> contracts
@@ -103,6 +104,8 @@ Forbidden directions:
   audit/outbox facts, failure metadata, and post-commit registry updates.
 - Fail-closed per-company activation registry hydration from persisted DB
   truth after restart.
+- Minimal runtime host composition plus explicit company enumeration for
+  bootstrap-time hydration.
 
 ## IAM Status
 
@@ -159,9 +162,11 @@ TEST_DATABASE_URL=postgres://... pnpm --filter @sfos/iam test
   planner preserves that historical order. New duplicate sequences fail.
 - Migration ownership validation is text-based; dynamic SQL and grants still
   require review.
-- Runtime host composition and cross-company hydration enumeration remain
-  deferred. Hydration currently accepts one explicit company/user tenant
-  context at a time.
+- `apps/runtime-host` is composition-only. No HTTP host, CLI entrypoint, or
+  workspace engine exists yet.
+- Startup hydration enumerates companies with system context and mirrors
+  persisted active rows, but it still does not reconcile missing modules or
+  repair invalid activation state.
 
 ## Read First
 
@@ -187,5 +192,5 @@ TEST_DATABASE_URL=postgres://... pnpm --filter @sfos/iam test
 
 ## Next Recommended Task
 
-Design minimal runtime host composition that invokes platform bootstrap, then
-explicit per-company activation hydration. Do not start workspace engine.
+Add the first thin host entrypoint or runner around `apps/runtime-host`
+without starting the workspace engine or adding app-level business logic.

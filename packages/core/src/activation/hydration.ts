@@ -7,6 +7,12 @@ import { satisfies } from '../capabilities/version.js';
 
 type ActivationStatus = 'pending' | 'active' | 'disabled' | 'failed';
 
+export interface PersistedActivationStateRow {
+  readonly moduleId: string;
+  readonly status: ActivationStatus;
+  readonly enabled: boolean;
+}
+
 export type ActivationHydrationDiagnostic =
   | {
       readonly code: 'activation_state_inconsistent';
@@ -48,13 +54,13 @@ interface HydrationRegistry extends ModuleRegistry {
 }
 
 interface ActivationRegistryHydratorOptions {
-  readonly db: SfosDb;
+  readonly db?: SfosDb;
   readonly registry: HydrationRegistry;
   readonly platformCapabilities?: readonly CapabilityKey[];
 }
 
 export class ActivationRegistryHydrator {
-  readonly #db: SfosDb;
+  readonly #db: SfosDb | undefined;
   readonly #registry: HydrationRegistry;
   readonly #platformCapabilities: ReadonlySet<string>;
 
@@ -65,6 +71,9 @@ export class ActivationRegistryHydrator {
   }
 
   async hydrateCompany(input: HydrateCompanyActivationsInput): Promise<ActivationHydrationResult> {
+    if (!this.#db) {
+      throw new Error('ActivationRegistryHydrator requires db for hydrateCompany()');
+    }
     const rows = await withTenantContext(
       this.#db,
       { companyId: input.companyId, userId: input.actorUserId },
@@ -80,10 +89,17 @@ export class ActivationRegistryHydrator {
           .orderBy(schema.companyModules.moduleId)
     );
 
+    return this.hydrateCompanyRows({ companyId: input.companyId, rows });
+  }
+
+  hydrateCompanyRows(input: {
+    readonly companyId: CompanyId;
+    readonly rows: readonly PersistedActivationStateRow[];
+  }): ActivationHydrationResult {
     const diagnostics: ActivationHydrationDiagnostic[] = [];
     const activeIds = new Set<string>();
 
-    for (const row of rows) {
+    for (const row of input.rows) {
       if (row.enabled !== (row.status === 'active')) {
         diagnostics.push({
           code: 'activation_state_inconsistent',

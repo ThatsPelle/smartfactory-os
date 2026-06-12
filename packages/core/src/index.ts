@@ -63,6 +63,7 @@ export {
   ModuleActivationService,
   ModuleDeactivationService,
   ActivationRegistryHydrator,
+  StartupHydrationOrchestrator,
   CORE_MODULE_ACTIVATION_EVENTS,
   CORE_RUNTIME_MODULE_ID,
   type ActivateModuleInput,
@@ -73,7 +74,13 @@ export {
   type ModuleDeactivationError,
   type HydrateCompanyActivationsInput,
   type ActivationHydrationDiagnostic,
-  type ActivationHydrationResult
+  type ActivationHydrationResult,
+  type PersistedActivationStateRow,
+  type StartupHydrationCompanyDiagnostic,
+  type StartupHydrationCompanyResult,
+  type StartupHydrationEnumerationError,
+  type StartupHydrationOrchestratorOptions,
+  type StartupHydrationReport
 } from './activation/index.js';
 
 export {

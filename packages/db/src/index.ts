@@ -24,3 +24,10 @@ export {
 } from './context.js';
 
 export * as schema from './schema/index.js';
+
+export {
+  listCompaniesForHydration,
+  listCompanyModuleActivationsForHydration,
+  type HydrationCompanyRecord,
+  type PersistedCompanyModuleActivationRow
+} from './hydration.js';

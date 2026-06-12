@@ -14,7 +14,8 @@ The foundation is built in dependency order:
 8. Runtime hosts and vertical slices.
 
 Steps 1-6 exist. Step 7 is the current foundation enforcement stage. Runtime
-features start only after it passes.
+features start only after it passes. A minimal runtime host now exists under
+`apps/runtime-host`; workspace/warehouse execution remains deferred.
 
 ## Runtime Bootstrap
 
@@ -49,14 +50,20 @@ Tenant deactivation is also explicit:
 4. Update the registry mirror only after committed success.
 
 After platform bootstrap, a runtime host hydrates one company at a time from
-persisted active rows. Hydration validates all rows first, atomically replaces
-the tenant mirror on success, and returns degraded diagnostics with an empty
-mirror on failure. It never calls activation hooks, emits activation events,
-writes activation rows, or auto-repairs state.
+persisted active rows. Company enumeration is explicit and platform-owned:
+`@sfos/db` lists companies and activation rows with read-only system context,
+and `@sfos/core` orchestrates per-company hydration from that persisted truth.
 
-Automatic bootstrap activation and workspace integration remain
-unimplemented. Cross-company enumeration and runtime host composition are
-still deferred; hydration itself preserves tenant RLS boundaries.
+Hydration validates all rows first, atomically replaces the tenant mirror on
+success, and returns degraded diagnostics with an empty mirror on failure. It
+never calls activation hooks, emits activation events, writes activation rows,
+or auto-repairs state.
+
+Enumeration failure is fail-fast for the whole hydration pass. Per-company row
+read failure degrades only that company and clears only that company mirror.
+
+Automatic bootstrap activation and workspace integration remain unimplemented.
+Bootstrap still does not silently mutate activation state.
 
 ## Current Foundation Gates
 
@@ -75,7 +82,8 @@ DB-backed tests that skip without `TEST_DATABASE_URL` are not full validation.
 After all gates pass on a clean Linux CI checkout:
 
 1. Close remaining documented enforcement warnings.
-2. Design runtime host composition, including explicit per-company hydration.
+2. Add the first real host wrapper or CLI entrypoint around
+   `apps/runtime-host`.
 3. Design workspace engine through an ADR/plan before implementation.
 
 Do not start UI or operational feature breadth during bootstrap work.

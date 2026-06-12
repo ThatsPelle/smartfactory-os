@@ -68,8 +68,11 @@ keeping persisted and mirrored state active.
 Restart hydration is explicit after bootstrap and tenant-scoped. It mirrors
 persisted active rows only after all registered-manifest and capability checks
 pass. It does not call activation hooks, emit activation events, create rows,
-or repair invalid state. Unresolved active rows produce deterministic degraded
-diagnostics and an empty mirror for that company.
+or repair invalid state. Runtime hosts enumerate companies explicitly through
+platform-owned DB helpers, then core hydrates each company in isolation.
+Unresolved active rows produce deterministic degraded diagnostics and an empty
+mirror for that company. Company enumeration failure aborts the pass without
+changing mirrors.
 
 ## Event Envelope
 
