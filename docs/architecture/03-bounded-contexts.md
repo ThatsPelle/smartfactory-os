@@ -49,7 +49,9 @@ to fail closed for tenant connections.
 
 `core.company_modules` is platform DB truth for tenant activation. Core
 orchestration updates it; modules receive lifecycle context and never write
-activation registry rows directly.
+activation registry rows directly. Runtime registry state is a cache of that
+truth: explicit activate/deactivate operations update it after persistence,
+and restart hydration replaces it from tenant-scoped reads.
 
 ## Event Boundaries
 

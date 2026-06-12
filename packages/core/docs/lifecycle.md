@@ -89,8 +89,22 @@ rates, and conflating them would push the engine into doing two jobs.
 `ModuleActivationService` drives the current activation path. It checks the
 registered manifest and active capability providers, invokes `activate`, then
 persists activation, audit, and outbox truth in the tenant transaction. Failed
-hooks persist `failed` status in a separate failure transaction. Deactivation
-and restart-time registry hydration remain future work.
+hooks persist `failed` status in a separate failure transaction.
+
+`ModuleDeactivationService` reads `core.company_modules` as truth, blocks
+removal of required active capability providers, invokes optional `deactivate`,
+then persists disabled status, audit, and outbox truth before changing the
+registry mirror. An omitted hook is a documented no-op. A hook failure keeps
+the module active, records failure metadata plus audit/outbox facts, and leaves
+the mirror active. Repeating deactivation for an already-disabled row is a
+no-op.
+
+After restart, `ActivationRegistryHydrator` reads one company through tenant
+RLS, validates active rows against registered manifests and capabilities, and
+atomically replaces that company's registry mirror. Hydration does not invoke
+tenant lifecycle hooks, emit activation events, write rows, or repair invalid
+truth. Any inconsistency returns deterministic diagnostics and clears that
+company's mirror so the runtime fails closed.
 
 ## History
 

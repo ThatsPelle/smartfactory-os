@@ -60,6 +60,10 @@ const warehouse: ModuleLifecycle = {
   async activate(ctx) {
     /* ... */ return { ok: true, value: undefined };
   },
+  async deactivate(ctx) {
+    /* ... release tenant-local resources; retain data */
+    return { ok: true, value: undefined };
+  },
   async register(ctx) {
     /* ... subscribe handlers ... */ return { ok: true, value: undefined };
   }
@@ -69,6 +73,8 @@ export default warehouse;
 ```
 
 The registry calls these hooks in the documented sequence; the module never touches platform internals.
+`deactivate` is optional. Omitting it is a documented no-op; core still
+persists disabled tenant state, audit, and outbox facts.
 
 ## Boundaries
 

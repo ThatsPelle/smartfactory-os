@@ -1,17 +1,16 @@
 import type { CapabilityKey, CompanyId, UserId } from '@sfos/contracts';
 import { Err, Ok, type Result } from '@sfos/contracts/result';
-import type { EventEnvelope } from '@sfos/contracts/envelope';
 import { schema, withTenantContext, type SfosDb } from '@sfos/db';
 import { buildEnvelope } from '@sfos/events';
 import type { ModuleLogger, ModuleRegistry, RegisteredModule } from '@sfos/module-sdk';
 import { eq } from 'drizzle-orm';
 
 import { AuditSink } from '../audit/sink.js';
-import { ForeignEmissionError, UndeclaredEmissionError } from '../events/ownership.js';
 import { satisfies } from '../capabilities/version.js';
 import { createDefaultLogger } from '../runtime/logger.js';
 
 import { CORE_MODULE_ACTIVATION_EVENTS, CORE_RUNTIME_MODULE_ID } from './events.js';
+import { createModuleEventEmitter } from './module-events.js';
 
 export type ModuleActivationError =
   | { readonly code: 'module_not_registered'; readonly moduleId: string }
@@ -93,7 +92,7 @@ export class ModuleActivationService {
         { companyId: input.companyId, userId: input.actorUserId },
         async (tx) => {
           const activationId = await this.#writePending(tx, input);
-          const events = this.#moduleEvents(tx, module, input.companyId);
+          const events = createModuleEventEmitter(tx, module, input.companyId);
 
           if (module.lifecycle.activate) {
             try {
@@ -213,38 +212,6 @@ export class ModuleActivationService {
       .returning({ id: schema.companyModules.id });
     if (!row) throw new Error(`Activation row missing for ${input.moduleId}`);
     return row.id;
-  }
-
-  #moduleEvents(tx: SfosDb, module: RegisteredModule, companyId: CompanyId) {
-    const declared = new Set(module.manifest.events_produced.map(({ type }) => type));
-    return {
-      emit: async (envelope: EventEnvelope): Promise<void> => {
-        if (envelope.source_module !== module.manifest.identity.id) {
-          throw new ForeignEmissionError(
-            module.manifest.identity.id,
-            envelope.source_module,
-            envelope.type
-          );
-        }
-        if (!declared.has(envelope.type)) {
-          throw new UndeclaredEmissionError(module.manifest.identity.id, envelope.type);
-        }
-        if (envelope.company_id !== companyId) {
-          throw new Error(`Activation event ${envelope.type} has wrong company_id`);
-        }
-        await tx.insert(schema.outboxEvents).values({
-          id: envelope.id,
-          companyId: envelope.company_id,
-          type: envelope.type,
-          version: envelope.version,
-          sourceModule: envelope.source_module,
-          correlationId: envelope.correlation_id,
-          causationId: envelope.causation_id,
-          envelope,
-          occurredAt: new Date(envelope.occurred_at)
-        });
-      }
-    };
   }
 
   async #recordFailure(input: ActivateModuleInput, message: string): Promise<void> {

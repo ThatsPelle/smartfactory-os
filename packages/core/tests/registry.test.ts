@@ -1,3 +1,4 @@
+import { asCompanyId } from '@sfos/contracts';
 import { describe, expect, it } from 'vitest';
 
 import { InMemoryModuleRegistry } from '../src/registry/module-registry.js';
@@ -64,6 +65,20 @@ describe('registry + manifest loader', () => {
       opts
     );
     expect(result.issues[0]!.kind).toBe('unsupported_runtime_mode');
+  });
+
+  it('atomically replaces active module mirror for one company', async () => {
+    const registry = new InMemoryModuleRegistry();
+    const company = asCompanyId('10000000-0000-4000-8000-000000000001');
+    const otherCompany = asCompanyId('10000000-0000-4000-8000-000000000002');
+
+    registry.markActive('sfos.old', company);
+    registry.markActive('sfos.other', otherCompany);
+    registry.replaceActiveModules(company, ['sfos.new']);
+
+    expect(await registry.isActive('sfos.old', company)).toBe(false);
+    expect(await registry.isActive('sfos.new', company)).toBe(true);
+    expect(await registry.isActive('sfos.other', otherCompany)).toBe(true);
   });
 
   it('registers modules and looks them up by capability', () => {

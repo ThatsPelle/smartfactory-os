@@ -27,6 +27,8 @@ import {
   OutboxPublisher,
   AuditSink,
   ModuleActivationService,
+  ModuleDeactivationService,
+  ActivationRegistryHydrator,
   renderDiagnostics
 } from '@sfos/core';
 
@@ -47,10 +49,18 @@ await publisher.run();
 
 // Explicit tenant activation uses the tenant-scoped DB client.
 const activations = new ModuleActivationService({ db: tenantDb, registry });
+const deactivations = new ModuleDeactivationService({ db: tenantDb, registry });
+const hydration = new ActivationRegistryHydrator({ db: tenantDb, registry });
 ```
 
 The `bootstrap` call is the one and only entry point. There is no
 `@sfos/core.init()` global side effect. There are no decorators.
+
+Tenant activation state is separate from platform bootstrap. Runtime hosts
+explicitly activate/deactivate modules, then hydrate each company registry
+mirror from `core.company_modules` after restart. Hydration validates persisted
+truth and capabilities but never invokes hooks, emits events, repairs rows, or
+auto-activates modules.
 
 ## Topics
 
@@ -99,6 +109,7 @@ packages/core/
 │   │   └── ownership.ts           — ForeignEmissionError
 │   ├── outbox/publisher.ts        — claim → dispatch → mark
 │   ├── audit/sink.ts              — append-only audit write helper
+│   ├── activation/                — activate, deactivate, restart hydration
 │   └── diagnostics/
 │       ├── state.ts               — RuntimeDiagnostics snapshot type
 │       └── reporter.ts            — human-readable render

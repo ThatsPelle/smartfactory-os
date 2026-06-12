@@ -36,7 +36,8 @@ export interface ModuleLifecycle {
    * Called when a tenant deactivates this module.
    *
    * Use for: clean shutdown of module-local resources for that tenant.
-   * Data is retained until explicit uninstall.
+   * Data is retained until explicit uninstall. Omitting this optional hook is
+   * an explicit safe no-op; core still persists the disabled tenant state.
    */
   deactivate?(ctx: TenantContext): Promise<Result<void, string>>;
 

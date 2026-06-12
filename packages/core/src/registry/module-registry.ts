@@ -17,9 +17,9 @@ import { ModuleAlreadyRegisteredError } from '../lifecycle/errors.js';
  *
  * This implementation deliberately does not consult the DB on every call —
  * `isActive` and `activeCapabilities` use an in-memory mirror that the
- * registry maintains, and the platform refreshes that mirror on tenant
- * module activate/deactivate events. (Refresh wiring lands when the
- * tenant activation flow ships; the mirror is empty until then.)
+ * registry maintains. Explicit activation/deactivation updates it after
+ * persistence, and restart hydration atomically replaces each tenant set
+ * from `core.company_modules`.
  */
 export class InMemoryModuleRegistry implements ModuleRegistry {
   readonly #byId = new Map<string, RegisteredModule>();
@@ -106,6 +106,11 @@ export class InMemoryModuleRegistry implements ModuleRegistry {
   /** Mirror state from core.company_modules: mark a module inactive for a tenant. */
   markInactive(moduleId: string, companyId: CompanyId): void {
     this.#activeByCompany.get(companyId)?.delete(moduleId);
+  }
+
+  /** Atomically replace one tenant's mirror from persisted activation truth. */
+  replaceActiveModules(companyId: CompanyId, moduleIds: readonly string[]): void {
+    this.#activeByCompany.set(companyId, new Set(moduleIds));
   }
 
   /** v1 capability-check helper: does some registered module provide every required cap? */

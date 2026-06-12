@@ -48,7 +48,8 @@ before consumers.
 - `preFlight`: fast platform-level readiness check.
 - `register`: event subscriptions and module-local registration.
 - `activate`: tenant activation hook invoked by explicit core orchestration.
-- `deactivate`: planned tenant deactivation hook.
+- `deactivate`: optional tenant shutdown hook invoked by explicit core
+  orchestration. Omission is a safe no-op; module data remains installed.
 
 Modules receive explicit contexts. No service locator or import-time singleton
 registration exists.
@@ -57,6 +58,18 @@ Activation validates the registered manifest and required active capability
 providers. Successful activation persists `core.company_modules`, audit, and
 outbox truth before the in-memory registry mirror changes. Bootstrap does not
 activate modules automatically.
+
+Deactivation reads persisted tenant activation truth, blocks removal of a
+required provider while an active dependent lacks an alternative, and persists
+disabled state, audit, and `core.module.deactivated` before changing the
+registry mirror. Hook failure records `core.module.deactivation_failed` while
+keeping persisted and mirrored state active.
+
+Restart hydration is explicit after bootstrap and tenant-scoped. It mirrors
+persisted active rows only after all registered-manifest and capability checks
+pass. It does not call activation hooks, emit activation events, create rows,
+or repair invalid state. Unresolved active rows produce deterministic degraded
+diagnostics and an empty mirror for that company.
 
 ## Event Envelope
 

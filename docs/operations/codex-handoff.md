@@ -99,6 +99,10 @@ Forbidden directions:
   ledger and SQL ownership checks.
 - Explicit tenant module activation with status, audit, outbox, capability
   checks, and registry mirroring.
+- Explicit tenant module deactivation with dependent-capability protection,
+  audit/outbox facts, failure metadata, and post-commit registry updates.
+- Fail-closed per-company activation registry hydration from persisted DB
+  truth after restart.
 
 ## IAM Status
 
@@ -155,8 +159,9 @@ TEST_DATABASE_URL=postgres://... pnpm --filter @sfos/iam test
   planner preserves that historical order. New duplicate sequences fail.
 - Migration ownership validation is text-based; dynamic SQL and grants still
   require review.
-- Deactivation orchestration and restart-time activation registry hydration
-  remain deferred.
+- Runtime host composition and cross-company hydration enumeration remain
+  deferred. Hydration currently accepts one explicit company/user tenant
+  context at a time.
 
 ## Read First
 
@@ -182,5 +187,5 @@ TEST_DATABASE_URL=postgres://... pnpm --filter @sfos/iam test
 
 ## Next Recommended Task
 
-Implement tenant module deactivation and restart-time activation registry
-hydration. Do not start the workspace engine before those paths are enforced.
+Design minimal runtime host composition that invokes platform bootstrap, then
+explicit per-company activation hydration. Do not start workspace engine.

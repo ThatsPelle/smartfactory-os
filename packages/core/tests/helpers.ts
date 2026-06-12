@@ -43,6 +43,7 @@ export const recordingLifecycle = (
     preFlight?: 'ok' | 'err' | 'throw';
     register?: 'ok' | 'err' | 'throw';
     activate?: 'ok' | 'err' | 'throw';
+    deactivate?: 'ok' | 'err' | 'throw';
   } = {}
 ): ModuleLifecycle & { calls: string[] } => {
   const calls: string[] = [];
@@ -69,6 +70,12 @@ export const recordingLifecycle = (
       ? async () => {
           calls.push('activate');
           return result(opts.activate, 'activate');
+        }
+      : undefined,
+    deactivate: opts.deactivate
+      ? async () => {
+          calls.push('deactivate');
+          return result(opts.deactivate, 'deactivate');
         }
       : undefined
   } as ModuleLifecycle & { calls: string[] };

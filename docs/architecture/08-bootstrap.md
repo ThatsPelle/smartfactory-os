@@ -41,8 +41,22 @@ explicit company activation through tenant-scoped DB orchestration:
 4. Persist audit and outbox records.
 5. Update the registry mirror only after committed success.
 
-Automatic bootstrap activation, deactivation orchestration, workspace
-integration, and restart-time registry hydration remain unimplemented.
+Tenant deactivation is also explicit:
+
+1. Read active DB truth and validate manifest/dependent capabilities.
+2. Invoke optional `deactivate` (omission is a no-op).
+3. Persist disabled state, audit, and outbox records.
+4. Update the registry mirror only after committed success.
+
+After platform bootstrap, a runtime host hydrates one company at a time from
+persisted active rows. Hydration validates all rows first, atomically replaces
+the tenant mirror on success, and returns degraded diagnostics with an empty
+mirror on failure. It never calls activation hooks, emits activation events,
+writes activation rows, or auto-repairs state.
+
+Automatic bootstrap activation and workspace integration remain
+unimplemented. Cross-company enumeration and runtime host composition are
+still deferred; hydration itself preserves tenant RLS boundaries.
 
 ## Current Foundation Gates
 
@@ -61,8 +75,7 @@ DB-backed tests that skip without `TEST_DATABASE_URL` are not full validation.
 After all gates pass on a clean Linux CI checkout:
 
 1. Close remaining documented enforcement warnings.
-2. Add deactivation and restart-time activation registry hydration.
-3. Design runtime host composition.
-4. Design workspace engine through an ADR/plan before implementation.
+2. Design runtime host composition, including explicit per-company hydration.
+3. Design workspace engine through an ADR/plan before implementation.
 
 Do not start UI or operational feature breadth during bootstrap work.

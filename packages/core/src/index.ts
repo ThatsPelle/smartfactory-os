@@ -61,11 +61,19 @@ export { AuditSink, type AuditWrite } from './audit/index.js';
 
 export {
   ModuleActivationService,
+  ModuleDeactivationService,
+  ActivationRegistryHydrator,
   CORE_MODULE_ACTIVATION_EVENTS,
   CORE_RUNTIME_MODULE_ID,
   type ActivateModuleInput,
   type ActivatedModule,
-  type ModuleActivationError
+  type ModuleActivationError,
+  type DeactivateModuleInput,
+  type DeactivatedModule,
+  type ModuleDeactivationError,
+  type HydrateCompanyActivationsInput,
+  type ActivationHydrationDiagnostic,
+  type ActivationHydrationResult
 } from './activation/index.js';
 
 export {
