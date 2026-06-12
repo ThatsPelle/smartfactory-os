@@ -1,0 +1,20 @@
+# Dependencies and generated output
+node_modules/
+.pnpm-store/
+dist/
+build/
+.turbo/
+coverage/
+.nyc_output/
+graphify-out/
+
+# Secrets and local configuration
+.env
+.env.*
+.claude/
+
+# Logs and temporary files
+*.log
+*.tmp
+tmp/
+temp/

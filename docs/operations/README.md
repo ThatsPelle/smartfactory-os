@@ -2,6 +2,11 @@
 
 Runbooks, deployment guides, and operational reference for SmartFactory OS.
 
+## Current references
+
+- `codex-handoff.md` — concise repository state, architecture boundaries,
+  validation status, and next safe task for coding agents.
+
 ## Planned contents
 
 - `self-host-install.md` — installing the self-hosted Docker Compose stack.
@@ -10,6 +15,6 @@ Runbooks, deployment guides, and operational reference for SmartFactory OS.
 - `troubleshooting.md` — common failures and their diagnosis.
 - `incident-response.md` — security incident response runbook.
 
-These documents will be written as deployment paths land in code. Until then, this directory is intentionally empty.
+These documents will be written as deployment paths land in code.
 
 For developer setup (running the repo locally), see `CONTRIBUTING.md` at the repo root.
