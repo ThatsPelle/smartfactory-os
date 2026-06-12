@@ -4,6 +4,13 @@ import { boolean, text, timestamp, unique, uuid } from 'drizzle-orm/pg-core';
 import { coreSchema } from './schemas.js';
 import { companies } from './companies.js';
 
+export const companyModuleActivationStatus = coreSchema.enum('company_module_activation_status', [
+  'pending',
+  'active',
+  'disabled',
+  'failed'
+]);
+
 /**
  * core.company_modules — which modules a tenant has enabled.
  *
@@ -27,10 +34,15 @@ export const companyModules = coreSchema.table(
       .references(() => companies.id, { onDelete: 'cascade' }),
     moduleId: text('module_id').notNull(),
     enabled: boolean('enabled').notNull().default(true),
+    status: companyModuleActivationStatus('status').notNull().default('active'),
+    failureReason: text('failure_reason'),
     enabledAt: timestamp('enabled_at', { withTimezone: true })
       .notNull()
       .default(sql`now()`),
-    disabledAt: timestamp('disabled_at', { withTimezone: true })
+    disabledAt: timestamp('disabled_at', { withTimezone: true }),
+    updatedAt: timestamp('updated_at', { withTimezone: true })
+      .notNull()
+      .default(sql`now()`)
   },
   (t) => ({
     companyModuleUnique: unique('company_modules_company_module_unique').on(t.companyId, t.moduleId)

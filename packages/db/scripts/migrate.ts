@@ -18,23 +18,13 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import postgres from 'postgres';
-import { discoverMigrationFiles, parseMigrationSourceArgs } from './migration-plan.ts';
+import { assertAppliedMigrationMatches, discoverRepositoryMigrations } from './migration-plan.ts';
+import { validateMigrationOwnership } from './migration-ownership.ts';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
-const migrationsDir = path.resolve(here, '..', 'drizzle');
-const migrationSource = parseMigrationSourceArgs(process.argv.slice(2), {
-  cwd: process.cwd(),
-  defaultDirectory: migrationsDir
-});
+const rootDirectory = path.resolve(here, '..', '..', '..');
 
-const adminUrl = process.env['DATABASE_ADMIN_URL'];
-if (!adminUrl) {
-  throw new Error('DATABASE_ADMIN_URL is not set. Copy packages/db/.env.example to .env first.');
-}
-
-const sql = postgres(adminUrl, { max: 1, onnotice: () => undefined });
-
-const ensureLedger = async (): Promise<void> => {
+const ensureLedger = async (sql: postgres.Sql): Promise<void> => {
   await sql`CREATE SCHEMA IF NOT EXISTS app`;
   await sql`
     CREATE TABLE IF NOT EXISTS app.drizzle_migrations (
@@ -52,27 +42,38 @@ const hash = async (content: string): Promise<string> => {
 };
 
 const main = async (): Promise<void> => {
-  await ensureLedger();
+  const files = await discoverRepositoryMigrations(rootDirectory);
+  const prepared = await Promise.all(
+    files.map(async (file) => {
+      const content = await readFile(file.filePath, 'utf8');
+      const errors = validateMigrationOwnership(content, file.owner);
+      if (errors.length > 0) {
+        throw new Error(
+          `Migration ownership validation failed for ${file.ledgerName}:\n${errors
+            .map((error) => `- ${error}`)
+            .join('\n')}`
+        );
+      }
+      return { ...file, content, fileHash: await hash(content) };
+    })
+  );
 
-  const files = await discoverMigrationFiles(migrationSource);
+  const adminUrl = process.env['DATABASE_ADMIN_URL'];
+  if (!adminUrl) {
+    throw new Error('DATABASE_ADMIN_URL is not set. Copy packages/db/.env.example to .env first.');
+  }
+  const sql = postgres(adminUrl, { max: 1, onnotice: () => undefined });
+  await ensureLedger(sql);
 
   const applied = await sql<{ name: string; hash: string }[]>`
     SELECT name, hash FROM app.drizzle_migrations
   `;
   const appliedByName = new Map(applied.map((r) => [r.name, r.hash]));
 
-  for (const { filePath, ledgerName } of files) {
-    const content = await readFile(filePath, 'utf8');
-    const fileHash = await hash(content);
-
+  for (const { ledgerName, content, fileHash } of prepared) {
     const existing = appliedByName.get(ledgerName);
     if (existing !== undefined) {
-      if (existing !== fileHash) {
-        throw new Error(
-          `Migration ${ledgerName} has been edited after being applied. ` +
-            `Append a forward-fix migration instead.`
-        );
-      }
+      assertAppliedMigrationMatches(ledgerName, existing, fileHash);
       // eslint-disable-next-line no-console
       console.log(`  skip  ${ledgerName}`);
       continue;

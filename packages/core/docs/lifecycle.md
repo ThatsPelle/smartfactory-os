@@ -86,6 +86,12 @@ activated what. That separation is intentional — module state across
 the platform and module activation per tenant change at very different
 rates, and conflating them would push the engine into doing two jobs.
 
+`ModuleActivationService` drives the current activation path. It checks the
+registered manifest and active capability providers, invokes `activate`, then
+persists activation, audit, and outbox truth in the tenant transaction. Failed
+hooks persist `failed` status in a separate failure transaction. Deactivation
+and restart-time registry hydration remain future work.
+
 ## History
 
 `engine.history()` returns an append-only buffer (soft-capped at 1024

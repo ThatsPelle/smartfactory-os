@@ -95,6 +95,10 @@ Forbidden directions:
 - Contracts, events, module SDK, PostgreSQL/RLS foundation, and core runtime.
 - IAM auth primitives, sessions, invitations, password reset, manifest,
   permissions, events, migrations, and adversarial test suites.
+- General manifest-driven module migration aggregation with one migration
+  ledger and SQL ownership checks.
+- Explicit tenant module activation with status, audit, outbox, capability
+  checks, and registry mirroring.
 
 ## IAM Status
 
@@ -132,7 +136,7 @@ pnpm validate:deps
 pnpm validate
 pnpm --filter @sfos/core test
 pnpm --filter @sfos/iam test
-pnpm db:migrate:test
+pnpm db:migrate
 pnpm test:ci
 ```
 
@@ -147,11 +151,12 @@ TEST_DATABASE_URL=postgres://... pnpm --filter @sfos/iam test
 
 - `validate:deps` reports `modules/module-iam/src/ui/placeholder.ts` as an
   orphan warning.
-- General module migration aggregation and tenant activation wiring remain
-  deferred. CI currently applies core and IAM migrations explicitly through
-  the shared migration ledger.
-- The ESLint source resolver fix for clean Linux checkouts needs confirmation
-  from the next GitHub Actions run.
+- Frozen core and IAM migrations reuse sequences `0001-0003`; the migration
+  planner preserves that historical order. New duplicate sequences fail.
+- Migration ownership validation is text-based; dynamic SQL and grants still
+  require review.
+- Deactivation orchestration and restart-time activation registry hydration
+  remain deferred.
 
 ## Read First
 
@@ -177,5 +182,5 @@ TEST_DATABASE_URL=postgres://... pnpm --filter @sfos/iam test
 
 ## Next Recommended Task
 
-Implement general module migration aggregation and tenant activation wiring.
-Do not start the workspace engine before those foundation paths are enforced.
+Implement tenant module deactivation and restart-time activation registry
+hydration. Do not start the workspace engine before those paths are enforced.

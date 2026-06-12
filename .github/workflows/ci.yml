@@ -115,7 +115,7 @@ jobs:
           node-version-file: .nvmrc
           cache: pnpm
       - run: pnpm install --frozen-lockfile
-      - name: Apply core and IAM migrations
+      - name: Apply core and module migrations
         run: pnpm db:migrate:test
       - name: Run tests with PostgreSQL
         run: pnpm test:ci

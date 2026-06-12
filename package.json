@@ -22,7 +22,8 @@
     "validate:manifests": "turbo run build --filter=./modules/* && node tools/manifest-validator/index.mjs",
     "validate:events": "turbo run build --filter=./modules/* && node tools/event-catalog/index.mjs",
     "validate:rls": "node tools/rls-checker/index.mjs",
-    "db:migrate:test": "pnpm --filter @sfos/db db:migrate && pnpm --filter @sfos/db db:migrate:iam",
+    "db:migrate": "turbo run build --filter=./modules/* && pnpm --filter @sfos/db db:migrate",
+    "db:migrate:test": "pnpm db:migrate",
     "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md,yml,yaml}\"",
     "format:check": "prettier --check \"**/*.{ts,tsx,js,jsx,json,md,yml,yaml}\"",
     "clean": "turbo run clean && rimraf node_modules .turbo"

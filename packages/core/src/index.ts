@@ -60,6 +60,15 @@ export {
 export { AuditSink, type AuditWrite } from './audit/index.js';
 
 export {
+  ModuleActivationService,
+  CORE_MODULE_ACTIVATION_EVENTS,
+  CORE_RUNTIME_MODULE_ID,
+  type ActivateModuleInput,
+  type ActivatedModule,
+  type ModuleActivationError
+} from './activation/index.js';
+
+export {
   renderDiagnostics,
   type ModuleDiagnostic,
   type RuntimeDiagnostics

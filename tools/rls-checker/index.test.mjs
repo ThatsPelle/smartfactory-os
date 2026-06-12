@@ -77,3 +77,11 @@ test('rejects an expected table missing from the migration corpus', () => {
 
   assert.match(errors, /module_iam\.credentials: required table not found/);
 });
+
+test('rejects missing explicit company module activation status', () => {
+  const errors = validateRlsCorpus([{ path: 'migrations.sql', content: validSql }], {
+    requireCompanyModuleActivationStatus: true
+  }).join('\n');
+
+  assert.match(errors, /core\.company_modules: missing explicit activation status/);
+});

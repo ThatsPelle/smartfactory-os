@@ -84,7 +84,9 @@ suite('outbox publisher', () => {
   });
 
   beforeEach(async () => {
-    await admin.sql`DELETE FROM core.outbox_events WHERE company_id = ${companyId}`;
+    // Publisher claims globally, not per company. Keep suite isolated from
+    // activation and other integration tests sharing the same database.
+    await admin.sql`DELETE FROM core.outbox_events`;
   });
 
   it('claims pending rows, dispatches, and marks published', async () => {

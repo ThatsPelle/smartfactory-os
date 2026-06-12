@@ -42,7 +42,6 @@
     "db:reset": "docker compose down -v && docker compose up -d",
     "db:psql": "docker compose exec postgres psql -U postgres -d sfos_dev",
     "db:migrate": "node --experimental-strip-types ./scripts/migrate.ts",
-    "db:migrate:iam": "node --experimental-strip-types ./scripts/migrate.ts --dir ../../modules/module-iam/src/migrations --ledger-prefix module-iam",
     "db:generate": "drizzle-kit generate",
     "test": "vitest run",
     "test:watch": "vitest"

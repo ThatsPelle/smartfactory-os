@@ -7,15 +7,17 @@ migrations) is handwritten.
 ## Running
 
 ```bash
-pnpm --filter @sfos/db db:migrate
+pnpm db:migrate
 ```
 
-The runner (`scripts/migrate.ts`) connects with `DATABASE_ADMIN_URL`,
-records applied migrations in `app.drizzle_migrations`, and refuses to
-proceed if a previously-applied file's content hash has changed.
+The root command builds module manifests, then the single runner
+(`scripts/migrate.ts`) discovers core migrations plus every module migration
+directory declared by a built manifest. It connects with
+`DATABASE_ADMIN_URL`, records applied migrations in
+`app.drizzle_migrations`, and refuses to proceed if a previously-applied
+file's content hash has changed.
 
-CI applies core migrations, then IAM migrations through the same runner and
-ledger:
+CI uses the same repository-wide command:
 
 ```bash
 pnpm db:migrate:test
@@ -23,6 +25,11 @@ pnpm db:migrate:test
 
 Module migration ledger names are path-namespaced, such as
 `module-iam/0001_iam_schema.sql`. Existing core ledger names remain unchanged.
+
+Frozen history contains overlapping core and IAM sequences `0001` through
+`0003`. The planner preserves their applied order: all frozen core entries,
+then frozen IAM entries. Starting with `0004`, sequence numbers are global and
+any duplicate fails before a database connection is opened.
 
 ## Adding a migration
 
@@ -68,21 +75,22 @@ Each step is its own migration. Each step can be deployed independently.
 
 ## Module ownership
 
-Modules own their schemas (`crm.*`, `wms.*`, …). Their migrations live
-under `modules/<name>/db/migrations/` but participate in the **global**
-sequence:
+Modules own their manifest namespace. Their migration directory is declared by
+`manifest.migrations.directory` and participates in the **global** sequence:
 
 ```
-packages/db/drizzle/0001_core_tables.sql
-modules/crm/db/migrations/0042_crm_init_contacts.sql
+packages/db/drizzle/0041_core_add_billing_email.sql
+modules/module-crm/src/migrations/0042_crm_init_contacts.sql
 packages/db/drizzle/0043_core_add_billing_email.sql
-modules/wms/db/migrations/0044_wms_init_stock_items.sql
+modules/module-wms/src/migrations/0044_wms_init_stock_items.sql
 ```
-
-General workspace-wide migration discovery remains future work. CI explicitly
-invokes the existing runner for IAM after core migrations. Other module
-directories are not auto-discovered.
 
 A module migration MUST NOT touch `core.*` or another module's schema.
-`dependency-cruiser` enforces this at the code level; the migration runner
-will gain a SQL-level check later (parses `ALTER`/`DROP` targets).
+Before execution, the runner inspects schema-qualified `CREATE`, `ALTER`, and
+`DROP` targets for schemas, tables, types, functions, indexes, triggers, and
+policies. Module schema objects must be qualified with their owned namespace.
+Core migrations may mutate only `core.*` and `app.*`.
+
+This is a pragmatic text validator, not a full PostgreSQL parser. It strips
+comments, quoted strings, and dollar-quoted bodies. Dynamic SQL and privilege
+grants are not interpreted. Review remains required for those constructs.

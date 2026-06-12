@@ -112,6 +112,19 @@ export const validateRlsCorpus = (files, options = {}) => {
     }
   }
 
+  if (options.requireCompanyModuleActivationStatus) {
+    const hasActivationStatus =
+      /\bCREATE\s+TYPE\s+core\.company_module_activation_status\s+AS\s+ENUM\s*\(\s*'pending'\s*,\s*'active'\s*,\s*'disabled'\s*,\s*'failed'\s*\)/i.test(
+        sql
+      ) &&
+      /\bALTER\s+TABLE\s+core\.company_modules\b[\s\S]*?\bADD\s+COLUMN\s+status\s+core\.company_module_activation_status\b/i.test(
+        sql
+      );
+    if (!hasActivationStatus) {
+      errors.push('core.company_modules: missing explicit activation status');
+    }
+  }
+
   return [...new Set(errors)].sort();
 };
 
@@ -145,7 +158,10 @@ export const runRlsValidation = async (rootDirectory) => {
   }));
 
   if (files.length === 0) return ['no SQL migrations discovered'];
-  return validateRlsCorpus(files, { requiredTables: REQUIRED_RLS_TABLES });
+  return validateRlsCorpus(files, {
+    requiredTables: REQUIRED_RLS_TABLES,
+    requireCompanyModuleActivationStatus: true
+  });
 };
 
 const isMain =

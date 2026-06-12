@@ -38,6 +38,7 @@ ownership document, migrations, tests, and validation coverage exist.
 
 - Each module owns one PostgreSQL schema, normally `module_<name>`.
 - A module migration changes only its own schema.
+- The migration runner validates schema-qualified DDL targets before execution.
 - Cross-module writes use an owning module API.
 - Cross-module reads use typed APIs or explicitly published read-only views.
 - Tenant-scoped tables carry `company_id` and use enabled and forced RLS.
@@ -45,6 +46,10 @@ ownership document, migrations, tests, and validation coverage exist.
 IAM is security-sensitive and has platform-scoped tables as well as
 tenant-scoped tables. All current IAM tables still have explicit RLS coverage
 to fail closed for tenant connections.
+
+`core.company_modules` is platform DB truth for tenant activation. Core
+orchestration updates it; modules receive lifecycle context and never write
+activation registry rows directly.
 
 ## Event Boundaries
 

@@ -47,11 +47,16 @@ before consumers.
 
 - `preFlight`: fast platform-level readiness check.
 - `register`: event subscriptions and module-local registration.
-- `activate`: planned tenant activation hook.
+- `activate`: tenant activation hook invoked by explicit core orchestration.
 - `deactivate`: planned tenant deactivation hook.
 
 Modules receive explicit contexts. No service locator or import-time singleton
 registration exists.
+
+Activation validates the registered manifest and required active capability
+providers. Successful activation persists `core.company_modules`, audit, and
+outbox truth before the in-memory registry mirror changes. Bootstrap does not
+activate modules automatically.
 
 ## Event Envelope
 

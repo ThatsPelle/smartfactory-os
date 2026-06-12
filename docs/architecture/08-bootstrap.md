@@ -32,8 +32,17 @@ or service locator.
 ## Tenant Activation
 
 Tenant activation is separate from platform bootstrap. `activate` and
-`deactivate` hooks exist in the SDK, but activation orchestration and workspace
-integration are not implemented.
+`deactivate` hooks exist in the SDK. `ModuleActivationService` now performs
+explicit company activation through tenant-scoped DB orchestration:
+
+1. Resolve registered manifest and required capabilities.
+2. Invoke the module activation hook.
+3. Persist active or failed status in `core.company_modules`.
+4. Persist audit and outbox records.
+5. Update the registry mirror only after committed success.
+
+Automatic bootstrap activation, deactivation orchestration, workspace
+integration, and restart-time registry hydration remain unimplemented.
 
 ## Current Foundation Gates
 
@@ -51,8 +60,8 @@ DB-backed tests that skip without `TEST_DATABASE_URL` are not full validation.
 
 After all gates pass on a clean Linux CI checkout:
 
-1. Add PostgreSQL service coverage to CI for DB-backed suites.
-2. Close remaining documented enforcement warnings.
+1. Close remaining documented enforcement warnings.
+2. Add deactivation and restart-time activation registry hydration.
 3. Design runtime host composition.
 4. Design workspace engine through an ADR/plan before implementation.
 

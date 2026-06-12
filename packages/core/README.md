@@ -21,7 +21,14 @@ import time, stop — that is not the shape of this runtime.
 ## Public surface
 
 ```ts
-import { bootstrap, EventBus, OutboxPublisher, AuditSink, renderDiagnostics } from '@sfos/core';
+import {
+  bootstrap,
+  EventBus,
+  OutboxPublisher,
+  AuditSink,
+  ModuleActivationService,
+  renderDiagnostics
+} from '@sfos/core';
 
 const { registry, bus, engine, diagnostics } = await bootstrap({
   platformVersion: '0.1.0',
@@ -37,6 +44,9 @@ console.log(renderDiagnostics(diagnostics));
 // Later, in a background loop:
 const publisher = new OutboxPublisher(adminDb, bus);
 await publisher.run();
+
+// Explicit tenant activation uses the tenant-scoped DB client.
+const activations = new ModuleActivationService({ db: tenantDb, registry });
 ```
 
 The `bootstrap` call is the one and only entry point. There is no
