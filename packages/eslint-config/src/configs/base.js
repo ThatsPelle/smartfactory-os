@@ -2,8 +2,8 @@
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import js from '@eslint/js';
-import tseslint from 'typescript-eslint';
-import importX, { createNodeResolver } from 'eslint-plugin-import-x';
+import { configs as tseslintConfigs } from 'typescript-eslint';
+import { createNodeResolver, flatConfigs as importXFlatConfigs } from 'eslint-plugin-import-x';
 import { createTypeScriptImportResolver } from 'eslint-import-resolver-typescript';
 import architecturePlugin from '../plugin-architecture.js';
 
@@ -15,12 +15,7 @@ const ALL_EXTENSIONS = [...TS_EXTENSIONS, '.js', '.jsx', '.cjs', '.mjs'];
 // regardless of which package's CWD ESLint runs in (turbo invokes per-package).
 const MONOREPO_ROOT = fileURLToPath(new URL('../../../..', import.meta.url));
 const toPosix = (/** @type {string} */ p) => p.split(path.sep).join('/');
-const TS_PROJECT_GLOBS = [
-  toPosix(path.join(MONOREPO_ROOT, 'packages/*/tsconfig.json')),
-  toPosix(path.join(MONOREPO_ROOT, 'apps/*/tsconfig.json')),
-  toPosix(path.join(MONOREPO_ROOT, 'modules/*/tsconfig.json')),
-  toPosix(path.join(MONOREPO_ROOT, 'tools/*/*/tsconfig.json'))
-];
+const LINT_TSCONFIG = toPosix(path.join(MONOREPO_ROOT, 'tsconfig.eslint.json'));
 
 /**
  * Base flat-config preset.
@@ -42,10 +37,10 @@ const baseConfig = [
 
   // 2. typescript-eslint's recommended set (non-type-checked for speed).
   //    Type-aware rules are opt-in per package via `recommendedTypeChecked`.
-  ...tseslint.configs.recommended,
+  ...tseslintConfigs.recommended,
 
   // 3. Import discipline — flat-config-native variant of eslint-plugin-import.
-  importX.flatConfigs.recommended,
+  importXFlatConfigs.recommended,
 
   // 3a. TypeScript-aware resolver wiring.
   //
@@ -65,8 +60,9 @@ const baseConfig = [
   //   - `createNodeResolver` → plain-JS fallback for `.cjs`/`.mjs` config
   //     files (e.g. this package's own .js sources).
   //
-  // Project globs are absolute (computed from MONOREPO_ROOT) so resolution
-  // works regardless of the CWD turbo runs ESLint in.
+  // The lint-only tsconfig maps public workspace package exports to source.
+  // Runtime package exports still point to dist; this mapping only prevents a
+  // clean CI checkout from requiring a build before static import resolution.
   {
     name: '@sfos/eslint-config/typescript-resolver',
     settings: {
@@ -78,10 +74,7 @@ const baseConfig = [
       'import-x/resolver-next': [
         createTypeScriptImportResolver({
           alwaysTryTypes: true,
-          project: TS_PROJECT_GLOBS,
-          // The resolver picks the best-matching tsconfig per source file;
-          // the multi-project notice is informational, not a defect.
-          noWarnOnMultipleProjects: true
+          project: LINT_TSCONFIG
         }),
         createNodeResolver()
       ]

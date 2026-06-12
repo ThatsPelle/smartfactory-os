@@ -37,7 +37,7 @@ SmartFactory OS aims for:
 - **RLS as security floor.** Row-level security is not optional. Every tenant-scoped table has `FORCE ROW LEVEL SECURITY`. The database rejects unauthorized access even if application code is wrong.
 - **Modular monolith first.** One deployable artifact; many logical modules. Service extraction is a transport change, not a redesign.
 - **Modules own their domains.** Each module owns its Postgres schema, its migrations, its events. No cross-module writes. No shared mutable state.
-- **Capability-driven dependencies.** Modules depend on capabilities (`iam.auth@1`), not on other modules by name.
+- **Capability-driven dependencies.** Modules depend on capabilities (`iam.authentication@1`), not on other modules by name.
 - **Events notify, they do not secretly mutate.** The event envelope is frozen. Only the owning module mutates its data. Events are read-only signals for everyone else.
 - **AI assists, it does not become source of truth.** AI proposes; humans approve; automation executes via tracked principals.
 

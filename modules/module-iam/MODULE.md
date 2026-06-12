@@ -9,6 +9,10 @@ Identity and Access Management for SmartFactoryOS.
 - Invitation-based onboarding
 - Password reset (secure, single-use tokens)
 
+## Capability
+
+Provides `iam.authentication@1`.
+
 ## Database role
 
 Connects as `module_iam_role` (NOBYPASSRLS) via `DATABASE_IAM_URL`.

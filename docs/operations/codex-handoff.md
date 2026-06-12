@@ -22,7 +22,7 @@ workstation deployment.
 | `modules/module-iam/`               | First operational module: credentials, sessions, invitations, password reset.                                     |
 | `tools/generators/module-template/` | Canonical module skeleton. Generator command is not implemented.                                                  |
 | `docs/adr/`                         | Accepted structural decisions. Append-only.                                                                       |
-| `docs/architecture/`                | Architecture index; eight referenced canonical documents are not present in this checkout.                        |
+| `docs/architecture/`                | Eight canonical architecture documents: blueprint through bootstrap plan.                                         |
 | `graphify-out/`                     | Local generated knowledge graph. Ignored by Git.                                                                  |
 
 ## Package Graph
@@ -100,7 +100,7 @@ Forbidden directions:
 
 `@sfos/iam` owns PostgreSQL schema `module_iam` and tables `credentials`,
 `sessions`, `invitations`, and `password_reset_tokens`. It provides
-`iam.auth@1`. Lifecycle currently implements only `preFlight`, requiring
+`iam.authentication@1`. Lifecycle currently implements only `preFlight`, requiring
 `DATABASE_IAM_URL`.
 
 Unit tests run without PostgreSQL. Integration and adversarial tests require
@@ -113,9 +113,9 @@ format:check
   -> lint
   -> typecheck
   -> validate:deps
-  -> validate:manifests (stub)
-  -> validate:events (stub)
-  -> validate:rls (stub)
+  -> validate:manifests
+  -> validate:events
+  -> validate:rls
   -> build
   -> test
 ```
@@ -142,18 +142,13 @@ TEST_DATABASE_URL=postgres://... pnpm --filter @sfos/iam test
 
 ## Current Issues
 
-- Eight architecture documents referenced by `AGENTS.md` and
-  `docs/architecture/README.md` are absent from this checkout.
-- `validate:manifests`, `validate:events`, and `validate:rls` only print stub
-  messages; CI does not enforce those contracts yet.
-- CI test job has no PostgreSQL service or `TEST_DATABASE_URL`, so DB-backed
-  core/IAM tests skip and must not be reported as full validation.
+- CI test jobs without PostgreSQL and `TEST_DATABASE_URL` skip DB-backed
+  core/IAM tests. Do not report those runs as full database validation.
 - `validate:deps` reports `modules/module-iam/src/ui/placeholder.ts` as an
   orphan warning.
-- ESLint reports three warnings in `packages/eslint-config/src/configs/base.js`.
-- IAM manifest provides `iam.auth@1`, while platform contracts also define
-  `iam.authentication@1`; align naming before capability consumers ship.
 - Module migration aggregation and tenant activation wiring remain deferred.
+- The ESLint source resolver fix for clean Linux checkouts needs confirmation
+  from the next GitHub Actions run.
 
 ## Read First
 
@@ -179,7 +174,6 @@ TEST_DATABASE_URL=postgres://... pnpm --filter @sfos/iam test
 
 ## Next Recommended Task
 
-Restore or commit the eight canonical architecture documents. Then implement
-real manifest, event catalog, and RLS validators before starting the workspace
-engine. This closes documentation and CI enforcement gaps without adding
-runtime features.
+Add PostgreSQL-backed CI coverage for core and IAM using an ephemeral database,
+then implement module migration aggregation and tenant activation wiring. Do
+not start the workspace engine before those foundation paths are enforced.

@@ -39,7 +39,8 @@ export const assertOwnership = (type: string, sourceModule: string): void => {
   if (!parsed) {
     throw new Error(`Invalid event type: "${type}"`);
   }
-  if (parsed.module !== sourceModule) {
+  const sourceNamespace = sourceModule.split('.').at(-1) ?? sourceModule;
+  if (parsed.module !== sourceNamespace) {
     throw new Error(
       `Module "${sourceModule}" cannot emit events with type "${type}" ` +
         `(owned by module "${parsed.module}")`

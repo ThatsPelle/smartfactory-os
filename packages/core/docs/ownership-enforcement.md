@@ -38,7 +38,7 @@ The DB layer enforces the same invariant against `core.outbox_events`:
 when modules ship with their own Postgres roles, RLS will refuse an
 INSERT whose `source_module` does not match the connection's module
 identity. Until then the manifest-level catalog validator (`pnpm
-validate:events`, currently a stub) is the cross-check at CI time.
+validate:events`) is the cross-check at CI time.
 
 Defense in depth means a single missed check at either layer is
 recoverable — both have to fail before a foreign-emission slips

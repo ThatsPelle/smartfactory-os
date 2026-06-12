@@ -1,6 +1,8 @@
+import { IAM_CAPABILITIES } from '@sfos/contracts/capabilities';
 import { defineManifest } from '@sfos/module-sdk';
 import { IAM_MODULE_ID } from './server/constants.js';
 import { IAM_EVENTS } from './server/events.js';
+import { IAM_PERMISSIONS } from './server/permissions.js';
 
 export default defineManifest({
   identity: {
@@ -16,7 +18,7 @@ export default defineManifest({
     runtime_modes_supported: ['cloud', 'self_hosted', 'workstation']
   },
   capabilities: {
-    provides: [{ key: 'iam.auth@1' }],
+    provides: [{ key: IAM_CAPABILITIES.AUTHENTICATION }],
     provides_optional: []
   },
   dependencies: {
@@ -34,12 +36,36 @@ export default defineManifest({
     ordering: 'sequential'
   },
   permissions: [
-    { key: 'iam.session.read', default_roles: ['member', 'admin'], scope: 'tenant' },
-    { key: 'iam.session.revoke', default_roles: ['member', 'admin'], scope: 'tenant' },
-    { key: 'iam.invitation.create', default_roles: ['admin'], scope: 'tenant' },
-    { key: 'iam.invitation.read', default_roles: ['member', 'admin'], scope: 'tenant' },
-    { key: 'iam.invitation.revoke', default_roles: ['admin'], scope: 'tenant' },
-    { key: 'iam.credential.change_password', default_roles: ['member', 'admin'], scope: 'tenant' }
+    {
+      key: IAM_PERMISSIONS.SESSION_READ,
+      default_roles: ['member', 'admin'],
+      scope: 'tenant'
+    },
+    {
+      key: IAM_PERMISSIONS.SESSION_REVOKE,
+      default_roles: ['member', 'admin'],
+      scope: 'tenant'
+    },
+    {
+      key: IAM_PERMISSIONS.INVITATION_CREATE,
+      default_roles: ['admin'],
+      scope: 'tenant'
+    },
+    {
+      key: IAM_PERMISSIONS.INVITATION_READ,
+      default_roles: ['member', 'admin'],
+      scope: 'tenant'
+    },
+    {
+      key: IAM_PERMISSIONS.INVITATION_REVOKE,
+      default_roles: ['admin'],
+      scope: 'tenant'
+    },
+    {
+      key: IAM_PERMISSIONS.CREDENTIAL_CHANGE_PW,
+      default_roles: ['member', 'admin'],
+      scope: 'tenant'
+    }
   ],
   events_produced: [
     {

@@ -34,4 +34,6 @@ These documents are **frozen foundations** until an ADR supersedes a section. Ad
 
 ## Documents
 
-The eight documents will be committed alongside the bootstrap in their final form during the next phase (they exist as the project's planning corpus already, prior to the repository). This README is the index.
+The eight documents above are committed in this directory. They describe
+implemented foundation behavior and mark future work explicitly. Structural
+changes require an ADR before these documents change.

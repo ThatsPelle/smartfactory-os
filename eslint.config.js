@@ -1,5 +1,5 @@
 // @ts-check
-import baseConfig from '@sfos/eslint-config/base';
+import nodeConfig from '@sfos/eslint-config/node';
 
 /**
  * Root ESLint flat config.
@@ -28,5 +28,5 @@ export default [
   },
 
   // Rules for any TS/JS at the root level (rare; mostly defensive).
-  ...baseConfig
+  ...nodeConfig
 ];

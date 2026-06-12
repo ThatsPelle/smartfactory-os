@@ -8,9 +8,15 @@ importers:
 
   .:
     devDependencies:
+      '@sfos/contracts':
+        specifier: workspace:*
+        version: link:packages/contracts
       '@sfos/eslint-config':
         specifier: workspace:*
         version: link:packages/eslint-config
+      '@sfos/events':
+        specifier: workspace:*
+        version: link:packages/events
       '@sfos/tsconfig':
         specifier: workspace:*
         version: link:packages/tsconfig
@@ -229,6 +235,9 @@ importers:
       typescript:
         specifier: ^5.6.2
         version: 5.9.3
+      vitest:
+        specifier: ^2.1.0
+        version: 2.1.9(@types/node@20.19.41)
 
   packages/module-sdk:
     dependencies:

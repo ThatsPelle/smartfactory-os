@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "extends": "./packages/tsconfig/base.json",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@sfos/contracts": ["packages/contracts/src/index.ts"],
+      "@sfos/contracts/*": ["packages/contracts/src/*"],
+      "@sfos/core": ["packages/core/src/index.ts"],
+      "@sfos/core/*": ["packages/core/src/*"],
+      "@sfos/db": ["packages/db/src/index.ts"],
+      "@sfos/db/*": ["packages/db/src/*"],
+      "@sfos/events": ["packages/events/src/index.ts"],
+      "@sfos/iam": ["modules/module-iam/src/index.ts"],
+      "@sfos/iam/*": ["modules/module-iam/src/*"],
+      "@sfos/module-sdk": ["packages/module-sdk/src/index.ts"]
+    }
+  },
+  "include": [
+    "apps/**/*.ts",
+    "apps/**/*.tsx",
+    "modules/**/*.ts",
+    "modules/**/*.tsx",
+    "packages/**/*.ts",
+    "packages/**/*.tsx",
+    "tools/**/*.ts",
+    "tools/**/*.tsx"
+  ],
+  "exclude": ["**/dist/**", "**/node_modules/**", "**/.turbo/**"]
+}
